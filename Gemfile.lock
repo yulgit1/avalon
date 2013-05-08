@@ -417,6 +417,8 @@ GEM
       multi_json (~> 1.0)
       rubyzip
       websocket (~> 1.0.4)
+    shoulda-matchers (2.1.0)
+      activesupport (>= 3.0.0)
     simplecov (0.7.1)
       multi_json (~> 1.0)
       simplecov-html (~> 0.7.1)
@@ -523,6 +525,7 @@ DEPENDENCIES
   rubyhorn!
   rvm-capistrano
   sass-rails (~> 3.2.3)
+  shoulda-matchers
   simplecov
   sqlite3
   therubyracer (= 0.10.2)

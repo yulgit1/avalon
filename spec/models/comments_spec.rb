@@ -15,41 +15,21 @@
 require 'spec_helper'
 
 describe Comment do 
-  before(:each) do
-    @comment_test = Comment.new(name: "John Smith",
-      email: "john.smith@example.com",
-      email_confirmation: "john.smith@example.com",
-      subject: Comment::SUBJECTS[2],
-      comment: "This is an RSpec test") 
-  end
   
-  it "should validate if all fields are entered correctly" do
-    @comment_test.should be_valid
-  end
+#  subject(:comment) { Comment.new(name: "John Smith",
+#      email: "john.smith@example.com",
+#      email_confirmation: "john.smith@example.com",
+#      subject: "Request for access",
+#      comment: "This is an RSpec test") }
   
-  it "should fail if the name is missing" do
-    @comment_test.name = nil
-    @comment_test.should_not be_valid
-  end
-  
-  describe "Subject" do
-    it "should fail if there is no subject" do
-      @comment_test.subject = nil
-      @comment_test.should_not be_valid
-    end
-    
-    it "should fail if the subject is not in the list" do
-      @comment_test.subject = 'Not in the list'
-      @comment_test.should_not be_valid    
-    end
-  end
-  
+#  it {should be_valid }
+  it {should validate_presence_of(:name).with_message("Name is a required field")}
+  it {should validate_presence_of(:subject).with_message("Choose a subject from the dropdown menu")}
+  it {should ensure_inclusion_of(:subject).in_array(Comment::SUBJECTS).with_message("Choose a subject from the dropdown menu")}
+  it {should validate_presence_of(:comment).with_message("Provide a comment before submitting the form")}
+  it {should validate_presence_of(:email).with_message("Email address is a required field")}
+
   describe "Comments" do
-    it "should fail if there is no comment" do
-      @comment_test.comment = nil
-      @comment_test.should_not be_valid
-    end
-    
     it "should strip out any unsafe HTML" do
       @comment_test.comment = 
         "<script>alert('This would be an exploit')</script><p>But this is safe</p>"

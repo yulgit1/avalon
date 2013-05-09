@@ -36,7 +36,6 @@
   gem 'felixwrapper', :git => "https://github.com/avalonmediasystem/felixwrapper.git"
   gem 'red5wrapper', :git => "https://github.com/avalonmediasystem/red5wrapper.git"
 
-  gem 'validates_email_format_of'
   gem 'loofah'
   gem 'omniauth-identity'
 

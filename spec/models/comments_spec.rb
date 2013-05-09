@@ -15,49 +15,37 @@
 require 'spec_helper'
 
 describe Comment do 
+  subject(:comment) {Comment.new(name: "Example", subject: "Other", email: "example@example.com", email_confirmation: "example@example.com", comment: "Example Comment")}
   
-#  subject(:comment) { Comment.new(name: "John Smith",
-#      email: "john.smith@example.com",
-#      email_confirmation: "john.smith@example.com",
-#      subject: "Request for access",
-#      comment: "This is an RSpec test") }
-  
-#  it {should be_valid }
   it {should validate_presence_of(:name).with_message("Name is a required field")}
   it {should validate_presence_of(:subject).with_message("Choose a subject from the dropdown menu")}
   it {should ensure_inclusion_of(:subject).in_array(Comment::SUBJECTS).with_message("Choose a subject from the dropdown menu")}
   it {should validate_presence_of(:comment).with_message("Provide a comment before submitting the form")}
-  it {should validate_presence_of(:email).with_message("Email address is a required field")}
+  it "should fail if a captcha value is entered" do
+    should_not_receive :nickname
+  end
+
+  context "Email address" do
+    it {should validate_presence_of(:email).with_message("Email address is a required field")}
+    it {should validate_confirmation_of(:email)}
+    it {should allow_value("example@example.com").for(:email)}
+    it {should_not allow_value("example@").for(:email)}
+    it {should_not allow_value("example").for(:email)}
+  end
 
   describe "Comments" do
-    it "should strip out any unsafe HTML" do
-      @comment_test.comment = 
+    it "should call scrub_comment" do
+      comment.should_receive(:scrub_comment)
+      comment.valid?
+    end 
+  end
+
+  describe "#scrub_comment" do
+    it "should scrub the comment" do
+      comment.comment = 
         "<script>alert('This would be an exploit')</script><p>But this is safe</p>"
-      @comment_test.comment.should_not match /\<script\>.*\<\\script\>/
+      comment.scrub_comment
+      comment.comment.should_not match /\<script\>.*\<\\script\>/
     end
-  end
-  
-  describe "Email validation" do
-    it "should warn if the addresses do not match" do
-      @comment_test.email = "email_one@example.com"
-      @comment_test.email_confirmation = "email_two@example.com"
-      @comment_test.should_not be_valid
-    end
-    
-    it "should warn if an address is invalid" do
-      @comment_test.email = "nosuchemail@"
-      @comment_test.should_not be_valid
-    end
-    
-    it "should have matching email addresses" do
-      @comment_test.should be_valid
-    end
-  end
-  
-  describe "Captcha" do
-    it "should fail if a captcha value is entered" do
-      @comment_test.nickname = 'Not empty'
-      @comment_test.should_not be_valid
-    end
-  end
+  end  
 end

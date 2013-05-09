@@ -13,15 +13,17 @@
 # ---  END LICENSE_HEADER BLOCK  ---
 
 class Comment
-  extend ActiveModel::Naming
+  extend ActiveModel::Callbacks
   include ActiveModel::Conversion
   include ActiveModel::Validations
+
+  after_validation :scrub_comment
   
   # For now this list is a hardcoded constant. Eventually it might be more flexible
   # as more thought is put into the process of providing a comment
   SUBJECTS = ["General feedback", "Request for access", "Technical support", "Other"]
   
-  attr_accessor :name, :subject, :email, :nickname
+  attr_accessor :name, :subject, :email, :nickname, :comment
 
   validates :name, 
     presence: {message: "Name is a required field"}
@@ -32,7 +34,7 @@ class Comment
   # expression that has to be tested / reviewed from time to time
   validates :email, 
     confirmation: {message: "Email addresses do not match"},
-    #email: {message: "Email address is not valid"},
+    format: {with: /^([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})$/i, message: "Email address is not valid"},
     presence: {message: "Email address is a required field"}
   validates :comment, 
     presence: { message: "Provide a comment before submitting the form"}
@@ -43,14 +45,10 @@ class Comment
   validates :nickname, 
     length: {is: 0, message: nil}
   
-  def comment
-    @comment
-  end
-  
-  def comment=(new_comment)
+  def scrub_comment
     # By default prune out all tags. It might be worth thinking about other approaches
     # supported by Loofah (see https://github.com/flavorjones/loofah)
-    @comment = Loofah.scrub_fragment(new_comment, :prune).to_s
+    @comment = Loofah.scrub_fragment(@comment, :prune).to_s
     
     logger.debug("Comment has been cleaned and now is")
     logger.debug(@comment)
@@ -66,11 +64,5 @@ class Comment
   # no database backing the Comment model
   def persisted?
     false
-  end
-  
-  def spam?
-    # TODO : Stub out a method for verifying that it is not spam beyond this basic
-    #        test
-    return (not @nickname.nil?)
   end
 end

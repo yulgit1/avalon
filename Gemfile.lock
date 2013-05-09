@@ -458,7 +458,6 @@ GEM
     unicorn-rails (1.0.0)
       rack
       unicorn
-    validates_email_format_of (1.5.3)
     warden (1.2.1)
       rack (>= 1.0)
     wasabi (3.0.0)
@@ -533,5 +532,4 @@ DEPENDENCIES
   twitter_bootstrap_form_for!
   uglifier (>= 1.0.3)
   unicorn-rails
-  validates_email_format_of
   whenever

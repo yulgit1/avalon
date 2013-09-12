@@ -13,6 +13,7 @@
 # ---  END LICENSE_HEADER BLOCK  ---
 
 #require 'hydra/rights_metadata'
+require 'avalon/duration'
 
 class MediaObject < ActiveFedora::Base
   include Hydra::ModelMixins::CommonMetadata
@@ -21,6 +22,7 @@ class MediaObject < ActiveFedora::Base
   include Hydra::ModelMixins::RightsMetadata
   include Avalon::Workflow::WorkflowModelMixin
   include Hydra::ModelMixins::Migratable
+  include Avalon::Duration
 
   # has_relationship "parts", :has_part
   has_many :parts, :class_name=>'MasterFile', :property=>:is_part_of
@@ -389,6 +391,7 @@ class MediaObject < ActiveFedora::Base
   
   def to_solr(solr_doc = Hash.new, opts = {})
     super(solr_doc, opts)
+    solr_doc[Solrizer.default_field_mapper.solr_name("document_show_link", :displayable, type: :string)] = search_result_label
     solr_doc[Solrizer.default_field_mapper.solr_name("created_by", :facetable, type: :string)] = self.DC.creator
     solr_doc[Solrizer.default_field_mapper.solr_name("hidden", type: :boolean)] = hidden?
     solr_doc[Solrizer.default_field_mapper.solr_name("duration", :displayable, type: :string)] = self.duration
@@ -405,6 +408,12 @@ class MediaObject < ActiveFedora::Base
     all_text_values << solr_doc["summary_ssim"]
     solr_doc["all_text_timv"] = all_text_values.flatten
     return solr_doc
+  end
+
+  def search_result_label
+    result_label = title.present? ? title.truncate(100) : pid
+    result_label << " (#{milliseconds_to_formatted_time(duration.to_i)})" if duration.present?
+    result_label
   end
 
   # Other validation to consider adding into future iterations is the ability to

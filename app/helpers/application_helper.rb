@@ -11,8 +11,11 @@
 #   CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 #   specific language governing permissions and limitations under the License.
 # ---  END LICENSE_HEADER BLOCK  ---
+require 'avalon/duration'
 
 module ApplicationHelper
+  include Avalon::Duration
+
   def application_name
     'Avalon'
   end
@@ -112,20 +115,20 @@ module ApplicationHelper
 
   # the mediainfo gem returns duration as milliseconds
   # see attr_reader.rb line 48 in the mediainfo source
-  def milliseconds_to_formatted_time( milliseconds )
-    total_seconds = milliseconds / 1000                                     
-    hours = total_seconds / (60 * 60)
-    minutes = (total_seconds / 60) % 60
-    seconds = total_seconds % 60
-
-    output = ''
-    if hours > 0
-      output += "#{hours}:"
-    end
-
-    output += "#{minutes.to_s.rjust(2,'0')}:#{seconds.to_s.rjust(2,'0')}"
-    output
-  end
+#  def milliseconds_to_formatted_time( milliseconds )
+#    total_seconds = milliseconds / 1000                                     
+#    hours = total_seconds / (60 * 60)
+#    minutes = (total_seconds / 60) % 60
+#    seconds = total_seconds % 60
+#
+#    output = ''
+#    if hours > 0
+#      output += "#{hours}:"
+#    end
+#
+#    output += "#{minutes.to_s.rjust(2,'0')}:#{seconds.to_s.rjust(2,'0')}"
+#    output
+#  end
   
   def link_to_add_dynamic_field( name, opts = {} )
     opts.merge!( class: 'add-dynamic-field btn btn-mini' )

@@ -329,4 +329,8 @@ describe MediaObject do
       media_object.to_solr.keys.reject { |k| k.is_a?(String) }.should == [:id]
     end
   end
+
+  describe '#search_result_label' do
+    pending "should make a properly formatted label"
+  end
 end

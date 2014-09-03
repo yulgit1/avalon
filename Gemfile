@@ -104,8 +104,14 @@
     gem 'license_header'
     gem 'pry'
     gem 'pry-rails'
-    gem 'pry-debugger'
-    gem 'debugger'
+    platforms :ruby_19 do
+      gem 'debugger'
+      gem 'pry-debugger'
+    end
+    platforms :ruby_20, :ruby_21 do
+      gem 'byebug'
+      gem 'pry-byebug'
+    end
     gem 'meta_request'
   end
 

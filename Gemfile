@@ -99,8 +99,6 @@
 
   group :development do
     gem 'xray-rails'
-    gem 'better_errors'
-    gem 'binding_of_caller'
     gem 'license_header'
     gem 'pry'
     gem 'pry-rails'
@@ -111,6 +109,8 @@
     platforms :ruby_20, :ruby_21 do
       gem 'byebug'
       gem 'pry-byebug'
+      gem 'better_errors', ">= 2.0.0"
+      gem 'binding_of_caller'
     end
     gem 'meta_request'
   end

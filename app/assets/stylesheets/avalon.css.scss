@@ -596,3 +596,9 @@ a[data-trigger='submit'] {
 #documents .document {
   padding-bottom: $padding-base-vertical;
 }
+.btn-danger:visited {
+  color: $white;
+}
+.nav > li > a.btn-danger {
+  @extend .btn-danger;
+}

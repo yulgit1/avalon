@@ -134,14 +134,22 @@ class MediaObjectsController < ApplicationController
   end
 
   def bulk_delete
-    message = ""
+    messages = []
     params[:id].each do |id|
-      media_object = MediaObject.find(params[:id])
+      media_object = MediaObject.find(id)
       authorize! :destroy, media_object
-      message += "#{media_object.title} (#{params[:id]}) has been successfuly deleted"
+      messages += ["#{media_object.title} (#{id}) has been successfuly deleted"]
       media_object.destroy
     end
-    redirect_to root_path, flash: { notice: message }
+    redirect_to root_path, flash: { notice: messages.join('<br/>').html_safe }
+  end
+
+  def bulk_publish
+    messages = []
+    params[:id].each do |id|
+      messages +=  [update_media_object_status(id, params[:status])]
+    end
+    redirect_to root_path, flash: { notice: messages.join('<br/>').html_safe }
   end
 
   def destroy
@@ -155,19 +163,7 @@ class MediaObjectsController < ApplicationController
   # Sets the published status for the object. If no argument is given then
   # it will just toggle the state.
   def update_status
-    media_object = MediaObject.find(params[:id])
-    authorize! :update, media_object
-    
-    case params[:status]
-      when 'publish'
-        media_object.publish!(user_key)
-      when 'unpublish'
-        media_object.publish!(nil) if can?(:unpublish, media_object)   
-    end
-
-    # additional save to set permalink
-    media_object.save( validate: false )
-    
+    update_media_object_status( params[:id], params[:status])
     redirect_to :back
   end
 
@@ -202,6 +198,22 @@ class MediaObjectsController < ApplicationController
   end
 
   protected
+
+  # Sets the published status for the object.
+  # If no argument is given then it will just toggle the state.
+  def update_media_object_status(id, status)
+    media_object = MediaObject.find(id)
+    authorize! :update, media_object
+    case status
+      when 'publish'
+        media_object.publish!(user_key)
+      when 'unpublish'
+        media_object.publish!(nil) if can?(:unpublish, media_object)
+    end
+    # additional save to set permalink
+    media_object.save( validate: false )
+    "#{media_object.title} (#{id}) has been successfuly #{status}ed."
+  end
 
   def load_master_files
     @mediaobject.parts_with_order

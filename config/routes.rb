@@ -44,6 +44,7 @@ Avalon::Application.routes.draw do
 
   match '/media_objects/:media_object_id/section/:id/embed' => 'master_files#embed', via: [:get]
   match '/media_objects/bulk/delete' => 'media_objects#bulk_delete', :as => :bulk_delete_media_objects, via: [:get]
+  match '/media_objects/bulk/publish' => 'media_objects#bulk_publish', :as => :bulk_publish_media_objects, via: [:get]
 
   resources :derivatives, only: [:create]
   

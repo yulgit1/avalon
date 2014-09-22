@@ -1,4 +1,14 @@
 <ul class="bookmarkTools nav nav-pills">
+  <%# if can? :publish, @response.documents.map {|doc| doc.id} %>
+  <li class="publish">
+    <%= link_to t('blacklight.tools.publish'), bulk_publish_media_objects_path(:method => :get, :id => @response.documents.map {|doc| doc.id}, :status => 'publish'), :name => 'publish', :class => 'btn btn-default publishLink' %>
+  </li>
+  <%# end %>
+  <%# if can? :unpublish, @response.documents.map {|doc| doc.id} %>
+  <li class="publish">
+    <%= link_to t('blacklight.tools.unpublish'), bulk_publish_media_objects_path(:method => :get, :id => @response.documents.map {|doc| doc.id}, :status => 'unpublish'), :name => 'publish', :class => 'btn btn-default publishlink' %>
+  </li>
+  <%# end %>
   <%# if can? :delete, @response.documents.map {|doc| doc.id} %>
   <li class="delete">
     <%= link_to t('blacklight.tools.delete'), bulk_delete_media_objects_path(:method => :delete, :id => @response.documents.map {|doc| doc.id}), :id => 'deleteLink', :name => 'delete', :class => 'btn btn-danger' %>

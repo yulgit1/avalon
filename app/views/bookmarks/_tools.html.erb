@@ -11,7 +11,7 @@
   <%# end %>
   <%# if can? :delete, @response.documents.map {|doc| doc.id} %>
   <li class="delete">
-    <%= link_to t('blacklight.tools.delete'), bulk_delete_media_objects_path(:method => :delete, :id => @response.documents.map {|doc| doc.id}), :id => 'deleteLink', :name => 'delete', :class => 'btn btn-danger' %>
+    <%= link_to t('blacklight.tools.delete'), bulk_delete_media_objects_path(:id => @response.documents.map {|doc| doc.id}), :id => 'deleteLink', :name => 'delete', :class => 'btn btn-danger' %>
   </li>
   <%# end %>
 

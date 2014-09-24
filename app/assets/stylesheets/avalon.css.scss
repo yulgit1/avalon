@@ -599,6 +599,11 @@ a[data-trigger='submit'] {
 .btn-danger:visited {
   color: $white;
 }
-.nav > li > a.btn-danger {
-  @extend .btn-danger;
+
+.nav-pills > li > a {
+  padding: 4px 15px;
+  /* override bootstrap .nav overrides of button colors */
+  &.btn-danger {
+    @extend .btn-danger;
+  }
 }

@@ -133,38 +133,64 @@ class MediaObjectsController < ApplicationController
     #@previous_view = media_object_path(@mediaobject)
   end
 
-  def bulk_delete
-    messages = []
-    params[:id].each do |id|
-      media_object = MediaObject.find(id)
-      authorize! :destroy, media_object
-      messages += ["#{media_object.title} (#{id}) has been successfuly deleted"]
-      media_object.destroy
-    end
-    redirect_to root_path, flash: { notice: messages.join('<br/>').html_safe }
-  end
-
-  def bulk_publish
-    messages = []
-    params[:id].each do |id|
-      messages +=  [update_media_object_status(id, params[:status])]
-    end
-    redirect_to root_path, flash: { notice: messages.join('<br/>').html_safe }
-  end
-
   def destroy
-    media_object = MediaObject.find(params[:id])
-    authorize! :destroy, media_object
-    message = "#{media_object.title} (#{params[:id]}) has been successfuly deleted"
-    media_object.destroy
+    errors = []
+    success_count = 0
+    Array(params[:id]).each do |id|
+      media_object = MediaObject.find(id)
+      if can? :destroy, media_object
+        media_object.destroy
+        success_count += 1
+      else
+        errors += [ "#{media_object.title} (#{params[:id]}) permission denied" ]
+      end      
+    end
+    message = "#{success_count} #{'media object'.pluralize(success_count)} successfully deleted."
+    message += "These objects were not deleted:</br> #{ errors.join('<br/> ') }" if errors.count > 0
     redirect_to root_path, flash: { notice: message }
+  end
+
+  def bulk_delete
+    render 'remove_bulk'
+  end
+  def bulk_destroy
+    destroy
   end
 
   # Sets the published status for the object. If no argument is given then
   # it will just toggle the state.
   def update_status
-    update_media_object_status( params[:id], params[:status])
-    redirect_to :back
+    status = params[:status]
+    errors = []
+    success_count = 0
+    Array(params[:id]).each do |id|
+      media_object = MediaObject.find(id)
+      if cannot? :update, media_object
+        errors += ["#{media_object.title} (#{id}) (permission denied)."]
+      else
+        case status
+          when 'publish'
+            media_object.publish!(user_key)
+            # additional save to set permalink
+            media_object.save( validate: false )
+            success_count += 1
+          when 'unpublish'
+            if can? :unpublish, media_object
+              media_object.publish!(nil)
+              success_count += 1
+            else
+              errors += ["#{media_object.title} (#{id}) (permission denied)."]
+            end
+        end
+      end
+    end
+    message = "#{success_count} #{'media object'.pluralize(success_count)} successfully #{status}ed."
+    message += "These objects were not #{status}ed:</br> #{ errors.join('<br/> ') }" if errors.count > 0
+    redirect_to :back, flash: {notice: message.html_safe}
+  end
+
+  def bulk_publish
+    update_status
   end
 
   # Sets the published status for the object. If no argument is given then
@@ -198,23 +224,7 @@ class MediaObjectsController < ApplicationController
   end
 
   protected
-
-  # Sets the published status for the object.
-  # If no argument is given then it will just toggle the state.
-  def update_media_object_status(id, status)
-    media_object = MediaObject.find(id)
-    authorize! :update, media_object
-    case status
-      when 'publish'
-        media_object.publish!(user_key)
-      when 'unpublish'
-        media_object.publish!(nil) if can?(:unpublish, media_object)
-    end
-    # additional save to set permalink
-    media_object.save( validate: false )
-    "#{media_object.title} (#{id}) has been successfuly #{status}ed."
-  end
-
+  
   def load_master_files
     @mediaobject.parts_with_order
   end

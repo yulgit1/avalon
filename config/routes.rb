@@ -21,13 +21,18 @@ Avalon::Application.routes.draw do
   resources :media_objects, except: [:create] do
     member do
       put :update_status
-      # 'delete' has special signifigance so use 'remove' for now
-      get :remove
       get :progress, :action => :show_progress
       get 'content/:datastream', :action => :deliver_content, :as => :inspect
       get 'track/:part', :action => :show, :as => :indexed_section
       get 'section/:content', :action => :show, :as => :pid_section
       get 'tree', :action => :tree, :as => :tree
+      get :confirmremove
+    end
+    collection do
+      # 'delete' has special signifigance so use 'remove' for now
+      get :confirmremove
+      put :update_status
+      delete :remove, :action => :destroy
     end
   end
   resources :master_files, except: [:new, :index] do
@@ -43,9 +48,6 @@ Avalon::Application.routes.draw do
   end
 
   match '/media_objects/:media_object_id/section/:id/embed' => 'master_files#embed', via: [:get]
-  match '/media_objects/bulk/destroy' => 'media_objects#bulk_destroy', :as => :bulk_destroy_media_objects, via: [:get]
-  match '/media_objects/bulk/publish' => 'media_objects#bulk_publish', :as => :bulk_publish_media_objects, via: [:get]
-  match '/media_objects/bulk/delete' => 'media_objects#bulk_delete', :as => :bulk_delete_media_objects, via: [:get]
   resources :derivatives, only: [:create]
   
   resources :comments, only: [:index, :create]

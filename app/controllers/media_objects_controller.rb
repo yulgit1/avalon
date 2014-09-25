@@ -21,7 +21,7 @@ class MediaObjectsController < ApplicationController
 
 #  before_filter :enforce_access_controls
   before_filter :inject_workflow_steps, only: [:edit, :update]
-  before_filter :load_player_context, only: [:show, :show_progress, :remove]
+  before_filter :load_player_context, only: [:show, :show_progress]
 
   # Catch exceptions when you try to reference an object that doesn't exist.
   # Attempt to resolve it to a close match if one exists and offer a link to
@@ -148,16 +148,6 @@ class MediaObjectsController < ApplicationController
     message = "#{success_count} #{'media object'.pluralize(success_count)} successfully deleted."
     message += "These objects were not deleted:</br> #{ errors.join('<br/> ') }" if errors.count > 0
     redirect_to root_path, flash: { notice: message }
-  end
-
-  def bulk_delete
-    bookmarks = Bookmark.joins("INNER JOIN users ON bookmarks.user_id = users.id and username='#{user_key}'").collect { |b| b.document_id }
-    params[:id].select!{ |b| bookmarks.include? b }
-    binding.pry
-    render 'remove_bulk'
-  end
-  def bulk_destroy
-    destroy
   end
 
   # Sets the published status for the object. If no argument is given then

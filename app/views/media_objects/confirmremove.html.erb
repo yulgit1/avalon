@@ -22,6 +22,7 @@ Unless required by applicable law or agreed to in writing, software distributed
 	  </div>
 	  <%= link_to 'Go back', :back, class: 'btn btn-default' %> 
 	<% else %>
+	  <% params[:id] = Array(params[:id]) %>
           <div class="alert alert-danger">
             <p>Are you certain you want to delete the following <%= 'resource'.pluralize(params[:id].count) %>?</p>
 	    <ul>
@@ -35,7 +36,7 @@ Unless required by applicable law or agreed to in writing, software distributed
 	      <% end %>
 	    </ul>
         </div>
-	<%= link_to 'Yes, I am sure', bulk_destroy_media_objects_path(:method => :delete, :id => params[:id]), :id => 'deleteLink', :name => 'delete', :class => 'btn btn-danger' %>
+	<%= link_to 'Yes, I am sure', remove_media_objects_path( :id => params[:id] ), :method => :delete, :id => 'deleteLink', :name => 'delete', :class => 'btn btn-danger' %>
 	<%= link_to 'No, go back', :back, class: 'btn btn-default' %> 
 	<% end %>
       </div>

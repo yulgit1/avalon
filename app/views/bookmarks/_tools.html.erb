@@ -1,17 +1,19 @@
 <ul class="bookmarkTools nav nav-pills">
   <%# if can? :publish, @response.documents.map {|doc| doc.id} %>
   <li class="publish">
-    <%= link_to t('blacklight.tools.publish'), bulk_publish_media_objects_path(:method => :get, :id => @response.documents.map {|doc| doc.id}, :status => 'publish'), :name => 'publish', :class => 'btn btn-default publishLink' %>
+    <%= link_to t('blacklight.tools.publish'), update_status_media_objects_path(:id => @response.documents.map {|doc| doc.id}, :status => 'publish'), :method => :put, :name => 'publish', :class => 'btn btn-default publishLink' %>
   </li>
   <%# end %>
   <%# if can? :unpublish, @response.documents.map {|doc| doc.id} %>
   <li class="publish">
-    <%= link_to t('blacklight.tools.unpublish'), bulk_publish_media_objects_path(:method => :get, :id => @response.documents.map {|doc| doc.id}, :status => 'unpublish'), :name => 'publish', :class => 'btn btn-default publishlink' %>
+    <%= link_to t('blacklight.tools.unpublish'), update_status_media_objects_path(:id => @response.documents.map {|doc| doc.id}, :status => 'unpublish'), :method => :put, :name => 'publish', :class => 'btn btn-default publishlink' %>
   </li>
   <%# end %>
   <%# if can? :delete, @response.documents.map {|doc| doc.id} %>
   <li class="delete">
-    <%= link_to t('blacklight.tools.delete'), bulk_delete_media_objects_path(:id => @response.documents.map {|doc| doc.id}), :id => 'deleteLink', :name => 'delete', :class => 'btn btn-danger' %>
+    <%= form_tag confirmremove_media_objects_path(:sort=>params[:sort], :per_page=>params[:per_page]), class: 'bulkAction', method: 'get' do %>
+      <%= submit_tag "Delete", class: "btn btn-danger bulkActionBtn", id: "deleteLink" %>
+    <% end %>
   </li>
   <%# end %>
 
@@ -21,3 +23,18 @@
   
   <%= render_marc_tools %>
 </ul>
+<% content_for :page_scripts do %>
+
+<script>
+$('input.bulkActionBtn').click(function(event){
+  event.preventDefault();
+  var form = $(this).closest("form");
+  form.remove('input[type="hidden"]');
+  vals = $('form.bookmark_toggle').has('input:checked').map(function(){return $(this).attr('data-doc-id');}).get();
+  vals.map( function(id) {
+    form.append('<input type="hidden" name="id[]" value="' + id + '"/>');
+  });
+  form.submit();
+});
+</script>
+<% end %>

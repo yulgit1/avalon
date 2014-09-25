@@ -151,6 +151,9 @@ class MediaObjectsController < ApplicationController
   end
 
   def bulk_delete
+    bookmarks = Bookmark.joins("INNER JOIN users ON bookmarks.user_id = users.id and username='#{user_key}'").collect { |b| b.document_id }
+    params[:id].select!{ |b| bookmarks.include? b }
+    binding.pry
     render 'remove_bulk'
   end
   def bulk_destroy

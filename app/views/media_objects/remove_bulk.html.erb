@@ -16,22 +16,28 @@ Unless required by applicable law or agreed to in writing, software distributed
 <div class="container-fluid">
     <div class="row-fluid">
       <div class="btn-options">
-        <div class="alert alert-danger">
-          <p>Are you certain you want to delete the following <%= 'resource'.pluralize(params[:id].count) %>?</p>
-	  <ul>
-	  <% params[:id].each do |id| %>
-	    <% @mediaobject = MediaObject.find(id)  %>
-	    <% if can? :destroy, @mediaobject  %>
-	      <li><%= @mediaobject.title %> (<%= id %>)</li>
-	    <% else %>
-	      <li><%= @mediaobject.title %> (<%= id %>): permission denied</li>
-	    <% end %>
-	  <% end %>
-	  </ul>
+	<% if params[:id].empty? %>
+          <div class="alert alert-danger">
+	    <p>No resources were selected.</p>
+	  </div>
+	  <%= link_to 'Go back', :back, class: 'btn btn-default' %> 
+	<% else %>
+          <div class="alert alert-danger">
+            <p>Are you certain you want to delete the following <%= 'resource'.pluralize(params[:id].count) %>?</p>
+	    <ul>
+	      <% params[:id].each do |id| %>
+		<% @mediaobject = MediaObject.find(id)  %>
+		<% if can? :destroy, @mediaobject  %>
+	          <li><%= @mediaobject.title %> (<%= id %>)</li>
+	        <% else %>
+	          <li><%= @mediaobject.title %> (<%= id %>): permission denied</li>
+	        <% end %>
+	      <% end %>
+	    </ul>
         </div>
-
 	<%= link_to 'Yes, I am sure', bulk_destroy_media_objects_path(:method => :delete, :id => params[:id]), :id => 'deleteLink', :name => 'delete', :class => 'btn btn-danger' %>
 	<%= link_to 'No, go back', :back, class: 'btn btn-default' %> 
+	<% end %>
       </div>
     </div>
 </div>

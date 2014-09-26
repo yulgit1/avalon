@@ -26,12 +26,12 @@ Avalon::Application.routes.draw do
       get 'track/:part', :action => :show, :as => :indexed_section
       get 'section/:content', :action => :show, :as => :pid_section
       get 'tree', :action => :tree, :as => :tree
-      get :confirmremove
+      get :confirm_remove
     end
     collection do
-      # 'delete' has special signifigance so use 'remove' for now
-      get :confirmremove
+      get :confirm_remove
       put :update_status
+      # 'delete' has special signifigance so use 'remove' for now
       delete :remove, :action => :destroy
     end
   end

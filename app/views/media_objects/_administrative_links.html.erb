@@ -49,7 +49,7 @@ Unless required by applicable law or agreed to in writing, software distributed
             extra cycles are available %>
 
         <% if can? :destroy, @mediaobject %>
-          <%= link_to 'Delete', confirmremove_media_object_path(@mediaobject), class: 'btn btn-danger' %>
+          <%= link_to 'Delete', confirm_remove_media_object_path(@mediaobject), class: 'btn btn-danger' %>
         <% end %>
       </div>
   </div>

@@ -17,7 +17,7 @@
   <%# end %>
   <%# if can? :delete, @response.documents.map {|doc| doc.id} %>
   <li class="delete">
-    <%= form_tag confirmremove_media_objects_path(:sort=>params[:sort], :per_page=>params[:per_page]), class: 'bulkAction', method: 'get' do %>
+    <%= form_tag confirm_remove_media_objects_path(:sort=>params[:sort], :per_page=>params[:per_page]), class: 'bulkAction', method: 'get' do %>
       <%= submit_tag "Delete", class: "btn btn-danger bulkActionBtn", id: "deleteLink" %>
     <% end %>
   </li>

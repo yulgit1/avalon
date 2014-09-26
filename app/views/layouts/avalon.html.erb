@@ -14,7 +14,7 @@ Unless required by applicable law or agreed to in writing, software distributed
 ---  END LICENSE_HEADER BLOCK  ---
 %>
 <!DOCTYPE html>
-<html>
+<html xmlns:og="http://ogp.me/ns#">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -27,7 +27,8 @@ Unless required by applicable law or agreed to in writing, software distributed
       <% end %>
     </title>
 
-   <%= csrf_meta_tags %>
+    <%= opengraph_meta_tags %>
+    <%= csrf_meta_tags %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <%= stylesheet_link_tag "application", media: "all" %>
     <%= yield :page_styles %>

@@ -167,6 +167,29 @@ module ApplicationHelper
       omission: "...#{label.last(end_length)}")
   end
 
+  def opengraph_meta_tags
+    metadata = if @currentStream
+      { 
+        url:         share_link_for(@currentStream),
+        title:       [@currentStream.mediaobject.title,@currentStream.label].compact.join(' - '),
+        description: @currentStream.mediaobject.abstract,
+        image:       poster_master_file_url(@currentStream),
+        type:        @currentStream.is_video? ? 'video.movie' : 'audio.other'
+      }
+    else
+      { 
+        url:         request.url,
+        title:       application_name,
+        image:       image_tag("Home.png")
+      }
+    end
+    metadata[:site_name] = application_name
+    
+    metadata.select { |k,v| v.present? }.collect { |prop, value|
+      tag(:meta, name: "og:#{prop}", content: value)
+    }.join("\n").html_safe
+  end
+  
   def master_file_meta_properties( m )
     formatted_duration = m.duration ? Duration.new(m.duration.to_i / 1000).iso8601 : ''
     item_type = m.is_video? ? 'http://schema.org/VideoObject' : 'http://schema.org/AudioObject'

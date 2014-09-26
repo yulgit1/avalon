@@ -1,12 +1,18 @@
 <ul class="bookmarkTools nav nav-pills">
   <%# if can? :publish, @response.documents.map {|doc| doc.id} %>
   <li class="publish">
-    <%= link_to t('blacklight.tools.publish'), update_status_media_objects_path(:id => @response.documents.map {|doc| doc.id}, :status => 'publish'), :method => :put, :name => 'publish', :class => 'btn btn-default publishLink' %>
+    <%= form_tag update_status_media_objects_path(:sort=>params[:sort], :per_page=>params[:per_page]), class: 'bulkAction', method: 'put' do %>
+      <%= hidden_field_tag 'status', 'publish' %>
+      <%= submit_tag "Publish", class: "btn btn-default bulkActionBtn", id: "publishLink" %>
+    <% end %>
   </li>
   <%# end %>
   <%# if can? :unpublish, @response.documents.map {|doc| doc.id} %>
   <li class="publish">
-    <%= link_to t('blacklight.tools.unpublish'), update_status_media_objects_path(:id => @response.documents.map {|doc| doc.id}, :status => 'unpublish'), :method => :put, :name => 'publish', :class => 'btn btn-default publishlink' %>
+    <%= form_tag update_status_media_objects_path(:sort=>params[:sort], :per_page=>params[:per_page]), class: 'bulkAction', method: 'put' do %>
+      <%= hidden_field_tag 'status', 'unpublish' %>
+      <%= submit_tag "Unpublish", class: "btn btn-default bulkActionBtn", id: "publishLink" %>
+    <% end %>
   </li>
   <%# end %>
   <%# if can? :delete, @response.documents.map {|doc| doc.id} %>

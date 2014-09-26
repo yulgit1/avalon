@@ -133,6 +133,20 @@ class MediaObjectsController < ApplicationController
     #@previous_view = media_object_path(@mediaobject)
   end
 
+  def confirm_reassign_collection
+    @candidates = get_user_collections
+  end
+
+  def reassign_collection
+    collection = Admin::Collection.find( params[:target_collection_id] )
+    binding.pry
+    Array(params[:id]).each do |id|
+      media_object = MediaObject.find(id)
+      media_object.collection = collection
+      media_object.save(:validate => false)
+    end    
+  end
+
   def destroy
     errors = []
     success_count = 0

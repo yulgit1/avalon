@@ -15,6 +15,17 @@
     <% end %>
   </li>
   <%# end %>
+
+  <li class="reassign">
+    <%= form_tag confirm_reassign_collection_media_objects_path(:sort=>params[:sort], :per_page=>params[:per_page]), class: 'bulkAction', method: 'get' do %>
+      <%= submit_tag "Reassign Collection", class: "btn btn-default bulkActionBtn", id: "reassignLink" %>
+    <% end %>
+  </li>
+
+  <li class="email">
+    <%= link_to t('blacklight.tools.email'), email_catalog_path(:sort=>params[:sort], :per_page=>params[:per_page], :id => @response.documents.map {|doc| doc.id}), :class=>"btn btn-default", :id => "emailLink", :data => {:ajax_modal => "trigger"} %>
+  </li>
+
   <%# if can? :delete, @response.documents.map {|doc| doc.id} %>
   <li class="delete">
     <%= form_tag confirm_remove_media_objects_path(:sort=>params[:sort], :per_page=>params[:per_page]), class: 'bulkAction', method: 'get' do %>
@@ -22,10 +33,6 @@
     <% end %>
   </li>
   <%# end %>
-
-  <li class="email">
-    <%= link_to t('blacklight.tools.email'), email_catalog_path(:sort=>params[:sort], :per_page=>params[:per_page], :id => @response.documents.map {|doc| doc.id}), :class=>"btn btn-default", :id => "emailLink", :data => {:ajax_modal => "trigger"} %>
-  </li>
   
   <%= render_marc_tools %>
 </ul>

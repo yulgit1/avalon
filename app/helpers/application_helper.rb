@@ -170,9 +170,9 @@ module ApplicationHelper
   def opengraph_meta_tags
     metadata = if @currentStream
       { 
-        url:         share_link_for(@currentStream),
-        title:       [@currentStream.mediaobject.title,@currentStream.label].compact.join(' - '),
-        description: @currentStream.mediaobject.abstract,
+        url:         pid_section_media_object_url(@mediaobject.pid, @currentStream.pid),
+        title:       [@mediaobject.title,@currentStream.label].compact.join(' - '),
+        description: @mediaobject.abstract,
         image:       poster_master_file_url(@currentStream),
         type:        @currentStream.is_video? ? 'video.movie' : 'audio.other'
       }
@@ -180,7 +180,7 @@ module ApplicationHelper
       { 
         url:         request.url,
         title:       application_name,
-        image:       image_tag("Home.png")
+        image:       image_url("Home.png")
       }
     end
     metadata[:site_name] = application_name

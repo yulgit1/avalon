@@ -126,26 +126,36 @@ class MediaObjectsController < ApplicationController
     end
   end
 
-  # This sets up the delete view which is an item preview with the ability
-  # to take the item out of the system for good (by POSTing to the destroy
-  # action)
-  def remove 
-    #@previous_view = media_object_path(@mediaobject)
-  end
-
   def confirm_reassign_collection
     @candidates = get_user_collections
+    @previous_view = URI(request.referer).path
   end
 
   def reassign_collection
     collection = Admin::Collection.find( params[:target_collection_id] )
-    binding.pry
+    if cannot? :read, collection
+      redirect_to :back, flash: {notice: 'You do not have permission to assign to collection #{collection.name}.'}
+    end
+    errors = []
+    success_count = 0
     Array(params[:id]).each do |id|
       media_object = MediaObject.find(id)
-      media_object.collection = collection
-      media_object.save(:validate => false)
+      if cannot? :update, media_object
+        errors += [ "#{media_object.title} (#{params[:id]}) permission denied" ]
+      else
+        media_object.collection = collection
+        media_object.save(:validate => false)
+        success_count += 1
+      end
     end    
+    message = "#{success_count} #{'media object'.pluralize(success_count)} successfully reassigned to collection #{collection.name}."
+    message += "These objects were not reassigned:</br> #{ errors.join('<br/> ') }" if errors.count > 0
+    redirect_to params[:previous_view], flash: { notice: message }
   end
+
+  def confirm_remove
+    @previous_view = URI(request.referer).path
+  end 
 
   def destroy
     errors = []
@@ -161,7 +171,7 @@ class MediaObjectsController < ApplicationController
     end
     message = "#{success_count} #{'media object'.pluralize(success_count)} successfully deleted."
     message += "These objects were not deleted:</br> #{ errors.join('<br/> ') }" if errors.count > 0
-    redirect_to root_path, flash: { notice: message }
+    redirect_to params[:previous_view]=='/bookmarks'? '/bookmarks' : root_path, flash: { notice: message }
   end
 
   # Sets the published status for the object. If no argument is given then
@@ -194,10 +204,6 @@ class MediaObjectsController < ApplicationController
     message = "#{success_count} #{'media object'.pluralize(success_count)} successfully #{status}ed."
     message += "These objects were not #{status}ed:</br> #{ errors.join('<br/> ') }" if errors.count > 0
     redirect_to :back, flash: {notice: message.html_safe}
-  end
-
-  def bulk_publish
-    update_status
   end
 
   # Sets the published status for the object. If no argument is given then

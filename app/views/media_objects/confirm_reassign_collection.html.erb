@@ -26,6 +26,7 @@ Unless required by applicable law or agreed to in writing, software distributed
   <% else %>
     <% params[:id] = Array(params[:id]) %>
     <%= form_tag reassign_collection_media_objects_path, method: 'put' do %>
+      <%= hidden_field_tag 'previous_view', @previous_view %>
       <div class="row-fluid">
 	<div class="alert">
 	  <fieldset>

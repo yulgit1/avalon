@@ -1,0 +1,33 @@
+<%= form_tag url_for(:controller => "bookmarks", :action => "delete"), :id => 'delete_form', :class => "form-horizontal ajax_form", :method => :post do %>
+<div class="modal-body">
+    <div class="row-fluid">
+      <div class="btn-options">
+        <% if @documents.empty? %>
+          <div class="alert alert-danger">
+            <p>No resources were selected.</p>
+          </div>
+          <%= link_to 'Go back', :back, class: 'btn btn-default' %> 
+        <% else %>
+          <div class="alert alert-danger">
+            <p>Are you certain you want to delete the following <%= 'resource'.pluralize(@documents.count) %>?</p>
+            <ul>
+              <% @documents.each do |doc| %>
+                <% id = doc.get(:id) %>
+                <% @mediaobject = MediaObject.find(id)  %>
+                <% if can? :destroy, @mediaobject  %>
+                  <li><%= @mediaobject.title %> (<%= id %>)<%=hidden_field_tag "id[]", id %></li>
+                <% else %>
+                  <li><%= @mediaobject.title %> (<%= id %>): permission denied</li>
+                <% end %>
+              <% end %>
+            </ul>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Yes, I am sure</button>
+            <%= link_to 'No, go back', :back, class: 'btn btn-default' %> 
+          </div>
+        <% end %>
+      </div>
+    </div>
+</div>
+<% end %>

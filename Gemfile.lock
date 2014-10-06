@@ -135,6 +135,17 @@ GIT
       om
       rest-client
 
+PATH
+  remote: ../../hydra/blacklight
+  specs:
+    blacklight (5.7.1)
+      bootstrap-sass (~> 3.2)
+      deprecation
+      kaminari (~> 0.13)
+      nokogiri (~> 1.6)
+      rails (>= 3.2.6, < 5)
+      rsolr (~> 1.0.6)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -195,13 +206,6 @@ GEM
       erubis (>= 2.6.6)
     binding_of_caller (0.7.2)
       debug_inspector (>= 0.0.1)
-    blacklight (5.7.0)
-      bootstrap-sass (~> 3.2)
-      deprecation
-      kaminari (~> 0.13)
-      nokogiri (~> 1.6)
-      rails (>= 3.2.6, < 5)
-      rsolr (~> 1.0.6)
     block_helpers (0.3.3)
       activesupport (>= 2.0)
     bootstrap-sass (3.2.0.1)
@@ -701,7 +705,7 @@ DEPENDENCIES
   bcrypt-ruby (~> 3.1.0)
   better_errors
   binding_of_caller
-  blacklight (~> 5.7)
+  blacklight!
   bootstrap_form
   browse-everything (>= 0.6.3)
   builder (~> 3.1.0)

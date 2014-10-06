@@ -1,0 +1,46 @@
+<div class="modal-body">
+  <button onclick="prevItem()"> Previous</button>
+  <% counter = 0 %>
+  <% @documents.each do |doc| %>
+    <% mo = MediaObject.find(doc.id) %>
+    <% mo.parts.each do |mf| %>
+      <div id=<%= "item-#{counter}" %> class="<%= counter == 0 ? "active" : "desktop-hidden" %>" >
+        <%= mf.embed_code(550).html_safe %>
+      </div>
+      <% counter += 1 %>
+    <% end %>
+  <% end %>
+  <button onclick="nextItem()">Next</button>
+</div>
+<script>
+  var counter = <%= counter %>;
+  function nextItem() {
+    var next = parseInt($('.active').attr('id').split('-')[1]) + 1;
+    if (next >= counter) {
+      return;
+    }
+    detachEndedListener();
+    $('.active').removeClass('active').addClass('desktop-hidden');
+    $("#item-" + next).removeClass('desktop-hidden').addClass('active');
+    attachEndedListener();
+  }
+  function prevItem() {
+    var prev = parseInt($('.active').attr('id').split('-')[1]) - 1;
+    if (prev < 0) {
+      return;
+    }
+    detachEndedListener();
+    $('.active').removeClass('active').addClass('desktop-hidden');
+    $("#item-" + prev).removeClass('desktop-hidden').addClass('active');
+    attachEndedListener();
+  }
+  function attachEndedListener() {
+    new MediaElementPlayer('.active #video-tag').media.addEventListener('ended', function() {
+        nextItem();
+        currentPlayer.play();
+    });
+   }
+  function detachEndedListener() {
+    new MediaElementPlayer('.active #video-tag').media.removeEventListener('ended');
+   }
+</script>

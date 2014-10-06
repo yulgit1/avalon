@@ -2,6 +2,10 @@ Avalon::Application.routes.draw do
   mount BrowseEverything::Engine => '/browse'
 #  HydraHead.add_routes(self)
 
+  get 'bookmarks/delete', :as => :delete_bookmarks
+  post 'bookmarks/delete'
+  get 'bookmarks/playlist', :as => :playlist_bookmarks
+
   #Blacklight catalog routes
   blacklight_for :catalog
   #match "catalog/facet/:id", :to => 'catalog#facet', :as => 'catalog_facet', via: [:get]

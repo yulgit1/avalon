@@ -6,8 +6,10 @@
   #gem 'protected_attributes'
   gem 'builder', '~>3.1.0'
 
+
+  gem 'blacklight', git: 'https://github.com/cjcolvar/blacklight.git', branch: 'bookmark-actions-refactor' # HEAD
   #gem 'blacklight', '~>5.7'
-  gem 'blacklight', path: '../../hydra/blacklight'
+  #gem 'blacklight', path: '../../hydra/blacklight'
   #gem 'hydra', '~>7.1'
   gem 'hydra-head', '~>7.2.0'
   gem 'active-fedora', '~> 7.1.0'

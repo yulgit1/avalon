@@ -12,6 +12,10 @@
   <% end %>
   <button onclick="nextItem()">Next</button>
 </div>
+<% content_for :page_scripts do %>
+  <%= javascript_include_tag 'jquery' %>
+  <%= javascript_include_tag "mediaelement_rails/mediaelement-and-player" =%>
+
 <script>
   var counter = <%= counter %>;
   function nextItem() {
@@ -44,3 +48,4 @@
     new MediaElementPlayer('.active #video-tag').media.removeEventListener('ended');
    }
 </script>
+<% end %>

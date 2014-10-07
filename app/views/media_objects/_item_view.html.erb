@@ -79,7 +79,12 @@ Unless required by applicable law or agreed to in writing, software distributed
   %>
 
   <script>
-    currentPlayer = new MediaElementPlayer('#video-tag', 
+    #TODO get the index of current section
+    var currentSectionIndex = 0;
+    var currentSection = <%= @masterfiles.first.id %>;
+    var sectionIds = <%= @masterfiles.map(&:id) %>;
+    function intializePlayer(duration) {
+      return new MediaElementPlayer('#video-tag', 
         { mode: 'auto_plugin',
           pluginPath: '/assets/mediaelement_rails/',
           usePluginFullScreen: false,
@@ -87,8 +92,30 @@ Unless required by applicable law or agreed to in writing, software distributed
           thumbnailSelectorEnabled: true,
           features: <%=features.inspect.html_safe%>,
           audioHeight: <%= MasterFile::AUDIO_HEIGHT %>,
-          mobileDisplayedDuration: <%= @currentStream ? (@currentStream.duration.to_f / 1000).round : -1 %>,
-          startQuality: 'high'
+          //mobileDisplayedDuration: duration,
+          startQuality: 'high',
+          success: function (mediaElement, domObject) { 
+            // add event listener
+            mediaElement.addEventListener('ended', function(e) {
+              alert("ended");
+              newplayer = nextSection();
+              newplayer.play();
+            }, false);
+          }
         });
+    }
+    function nextSection() {
+      //replace #video-tag
+      nextSection = sectionIds[currentSectionIndex + 1];
+      $.get("media_objects/" + nextSection, {video_tag: 'true'}, function(data){
+        $('#video-tag').replaceWith(data);
+      });
+      currentSectionIndex = currentSectionIndex + 1;
+      //TODO how to do next line
+      //duration = <%= @currentStream ? (@currentStream.duration.to_f / 1000).round : -1 %>
+      //return initializePlayer(duration);
+      return initializePlayer(0);
+    }
+    currentPlayer = initializePlayer(<%= @currentStream ? (@currentStream.duration.to_f / 1000).round : -1 %>);
   </script>
 <% end %>

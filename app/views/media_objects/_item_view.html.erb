@@ -79,11 +79,11 @@ Unless required by applicable law or agreed to in writing, software distributed
   %>
 
   <script>
-    #TODO get the index of current section
+    //#TODO get the index of current section
     var currentSectionIndex = 0;
-    var currentSection = <%= @masterfiles.first.id %>;
-    var sectionIds = <%= @masterfiles.map(&:id) %>;
-    function intializePlayer(duration) {
+    var sectionIds = <%= raw @masterFiles.map(&:id).to_json %>;
+    var sectionDurations = <%= @masterFiles.collect {|mf| (mf.duration.to_f / 1000).round } %>;
+    function initializePlayer() {
       return new MediaElementPlayer('#video-tag', 
         { mode: 'auto_plugin',
           pluginPath: '/assets/mediaelement_rails/',
@@ -92,14 +92,14 @@ Unless required by applicable law or agreed to in writing, software distributed
           thumbnailSelectorEnabled: true,
           features: <%=features.inspect.html_safe%>,
           audioHeight: <%= MasterFile::AUDIO_HEIGHT %>,
-          //mobileDisplayedDuration: duration,
+          mobileDisplayedDuration: sectionDurations[currentSectionIndex],
           startQuality: 'high',
           success: function (mediaElement, domObject) { 
             // add event listener
             mediaElement.addEventListener('ended', function(e) {
               alert("ended");
-              newplayer = nextSection();
-              newplayer.play();
+              //newplayer = nextSection();
+              //newplayer.play();
             }, false);
           }
         });
@@ -111,11 +111,8 @@ Unless required by applicable law or agreed to in writing, software distributed
         $('#video-tag').replaceWith(data);
       });
       currentSectionIndex = currentSectionIndex + 1;
-      //TODO how to do next line
-      //duration = <%= @currentStream ? (@currentStream.duration.to_f / 1000).round : -1 %>
-      //return initializePlayer(duration);
-      return initializePlayer(0);
+      return initializePlayer();
     }
-    currentPlayer = initializePlayer(<%= @currentStream ? (@currentStream.duration.to_f / 1000).round : -1 %>);
+    currentPlayer = initializePlayer();
   </script>
 <% end %>

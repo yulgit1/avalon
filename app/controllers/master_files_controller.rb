@@ -25,8 +25,21 @@ class MasterFilesController < ApplicationController
   before_filter :ensure_readable_filedata, :only => [:create]
 
   def show
-    masterfile = MasterFile.find(params[:id])
-    redirect_to pid_section_media_object_path(masterfile.mediaobject.pid, masterfile.pid)
+    @masterfile = MasterFile.find(params[:id])
+    redirect_to pid_section_media_object_path(@masterfile.mediaobject.pid, @masterfile.pid)
+  end
+
+  def player
+    @masterfile = MasterFile.find(params[:id])
+    if can? :read, @masterfile.mediaobject
+      @token = @masterfile.nil? ? "" : StreamToken.find_or_create_session_token(session, @masterfile.mediapackage_id)
+      @stream_info = @masterfile.stream_details(@token, default_url_options[:host])
+    end
+    respond_to do |format|
+      format.js do
+          render 
+      end
+    end
   end
 
   def embed

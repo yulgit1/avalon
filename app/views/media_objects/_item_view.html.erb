@@ -83,6 +83,8 @@ Unless required by applicable law or agreed to in writing, software distributed
     var currentSectionIndex = 0;
     var sectionIds = <%= raw @masterFiles.map(&:id).to_json %>;
     var sectionDurations = <%= @masterFiles.collect {|mf| (mf.duration.to_f / 1000).round } %>;
+    var playThrough = true;
+    var currentStream = sectionIds[currentSectionIndex];
     function initializePlayer() {
       return new MediaElementPlayer('#video-tag', 
         { mode: 'auto_plugin',
@@ -97,21 +99,36 @@ Unless required by applicable law or agreed to in writing, software distributed
           success: function (mediaElement, domObject) { 
             // add event listener
             mediaElement.addEventListener('ended', function(e) {
-              alert("ended");
-              //newplayer = nextSection();
-              //newplayer.play();
+              nextSection();
             }, false);
+            //FIXME next line is not ideal
+            if (currentSectionIndex > 0) {
+              mediaElement.play();
+            }
           }
         });
     }
     function nextSection() {
       //replace #video-tag
-      nextSection = sectionIds[currentSectionIndex + 1];
-      $.get("media_objects/" + nextSection, {video_tag: 'true'}, function(data){
-        $('#video-tag').replaceWith(data);
+      if ((currentSectionIndex + 1) == sectionIds.length) {
+        return;
+      }
+      var nextSection = sectionIds[currentSectionIndex + 1];
+      $.ajax({url: '/master_files/' + nextSection + '/player',
+             dataType: 'html',
+             success: function(data){
+               $("#player").replaceWith(data);
+               currentSectionIndex = currentSectionIndex + 1;
+               currentStream = sectionIds[currentSectionIndex];
+               currentPlayer = initializePlayer();
+               //Update highlighted section
+               $('.current-stream').parent().find('i').remove();
+               $('.current-stream').removeClass('current-stream');
+               $('a[data-segment="'+currentStream+'"]').addClass("current-stream");
+               $('a[data-segment="'+currentStream+'"]').parent().append('<i class="icon-circle-arrow-left"></i>');
+               //TODO update share and embed
+             }
       });
-      currentSectionIndex = currentSectionIndex + 1;
-      return initializePlayer();
     }
     currentPlayer = initializePlayer();
   </script>

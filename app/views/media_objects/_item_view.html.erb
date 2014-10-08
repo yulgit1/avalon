@@ -85,6 +85,8 @@ Unless required by applicable law or agreed to in writing, software distributed
     var sectionDurations = <%= @masterFiles.collect {|mf| (mf.duration.to_f / 1000).round } %>;
     var playThrough = true;
     var currentStream = sectionIds[currentSectionIndex];
+    var sectionShareLinks = <%= raw @masterFiles.collect {|mf| share_link_for(mf)}.to_json %>;
+    var sectionEmbedCodes = <%= raw @masterFiles.collect {|mf| mf.embed_code(MasterFile::EMBED_SIZE[:medium], { urlappend: '/embed' })}.to_json %>
     function initializePlayer() {
       return new MediaElementPlayer('#video-tag', 
         { mode: 'auto_plugin',
@@ -126,7 +128,9 @@ Unless required by applicable law or agreed to in writing, software distributed
                $('.current-stream').removeClass('current-stream');
                $('a[data-segment="'+currentStream+'"]').addClass("current-stream");
                $('a[data-segment="'+currentStream+'"]').parent().append('<i class="icon-circle-arrow-left"></i>');
-               //TODO update share and embed
+               //update share and embed
+               $('#link-section').val(sectionShareLinks[currentSectionIndex]);
+               $('#embed-part').val(sectionEmbedCodes[currentSectionIndex]);
              }
       });
     }

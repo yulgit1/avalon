@@ -23,7 +23,7 @@ class StreamToken < ActiveRecord::Base
 
   def self.find_or_create_session_token(session, target)
     self.purge_expired!
-    result = self.find_or_create_by_token_and_target(media_token(session), target)
+    result = self.find_or_create_by(token: media_token(session), target: target)
     result.renew!
     result.token
   end
@@ -40,7 +40,7 @@ class StreamToken < ActiveRecord::Base
     raise Unauthorized, "Unauthorized" if value.nil?
 
     (target, token_string) = value.scan(/^(.+)-(.+)$/).first
-    token = self.find_by_token_and_target(token_string, target)
+    token = self.find_by(token: token_string, target: target)
     if token.present? and token.expires > Time.now
       token.renew!
       return target
@@ -49,7 +49,11 @@ class StreamToken < ActiveRecord::Base
     end
   end
 
+  def default_expiration
+    Time.now + Avalon::Configuration.lookup('streaming.stream_token_ttl').minutes
+  end
+
   def renew!
-    self.update_attribute :expires, ( Time.now + Avalon::Configuration.lookup('streaming.stream_token_ttl').minutes )
+    self.update_attribute :expires, [expires, default_expiration].compact.max
   end
 end

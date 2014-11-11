@@ -54,7 +54,7 @@ describe StreamToken do
       stream_token.update_attribute :expires, new_expiration
       expect(StreamToken.validate_token(token)).to eq(target)
       stream_token.reload
-      expect(stream_token.expires).to be > new_expiration
+      expect(stream_token.expires.to_i).to be > new_expiration.to_i
     end
     
     it "should not renew a token that isn't within configured expiration limits" do
@@ -62,7 +62,7 @@ describe StreamToken do
       stream_token.update_attribute :expires, new_expiration
       expect(StreamToken.validate_token(token)).to eq(target)
       stream_token.reload
-      expect(stream_token.expires).to eq(new_expiration)
+      expect(stream_token.expires.to_i).to eq(new_expiration.to_i)
     end
   end
 end

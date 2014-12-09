@@ -67,7 +67,7 @@
   #gem 'devise-guests'
   gem 'haml'
 
-  gem 'rubyhorn', git: "https://github.com/avalonmediasystem/rubyhorn.git" # HEAD , tag: 'avalon-r3'
+  gem 'rubyhorn', git: "https://github.com/avalonmediasystem/rubyhorn.git", branch: 'puppet-3.2'
   gem 'validates_email_format_of'
   gem 'loofah'
   gem 'omniauth-identity'

@@ -26,9 +26,8 @@ class MasterFile < ActiveFedora::Base
   include Rails.application.routes.url_helpers
   include Permalink
   include VersionableModel
+  include MatterhornWorkflow
   
-  WORKFLOWS = ['fullaudio', 'avalon', 'avalon-skip-transcoding', 'avalon-skip-transcoding-audio']
-
   belongs_to :mediaobject, :class_name=>'MediaObject', :property=>:is_part_of
   has_many :derivatives, :class_name=>'Derivative', :property=>:is_derivation_of
 
@@ -44,35 +43,18 @@ class MasterFile < ActiveFedora::Base
     d.field :thumbnail_offset, :string
   end
 
-  has_metadata name: 'mhMetadata', :type => ActiveFedora::SimpleDatastream do |d|
-    d.field :workflow_id, :string
-    d.field :workflow_name, :string
-    d.field :mediapackage_id, :string
-    d.field :percent_complete, :string
-    d.field :percent_succeeded, :string
-    d.field :percent_failed, :string
-    d.field :status_code, :string
-    d.field :operation, :string
-    d.field :error, :string
-    d.field :failures, :string
-  end
-
   has_metadata name: 'masterFile', type: UrlDatastream
 
   has_attributes :file_checksum, :file_size, :duration, :display_aspect_ratio, :original_frame_size, :file_format, :poster_offset, :thumbnail_offset, datastream: :descMetadata, multiple: false
-  has_attributes :workflow_id, :workflow_name, :mediapackage_id, :percent_complete, :percent_succeeded, :percent_failed, :status_code, :operation, :error, :failures, datastream: :mhMetadata, multiple: false
 
   has_file_datastream name: 'thumbnail'
   has_file_datastream name: 'poster'
 
-
-  validates :workflow_name, presence: true, inclusion: { in: Proc.new{ WORKFLOWS } }
   validates_each :poster_offset, :thumbnail_offset do |record, attr, value|
     unless value.nil? or value.to_i.between?(0,record.duration.to_i)
       record.errors.add attr, "must be between 0 and #{record.duration}"
     end
   end
-  #validates :file_format, presence: true, exclusion: { in: ['Unknown'], message: "The file was not recognized as audio or video." }
 
   has_model_version 'R3'
   before_save 'update_stills_from_offset!'
@@ -98,7 +80,6 @@ class MasterFile < ActiveFedora::Base
   VIDEO_TYPES = ["application/mp4", "video/mpeg", "video/mpeg2", "video/mp4", "video/quicktime", "video/avi"]
   UNKNOWN_TYPES = ["application/octet-stream", "application/x-upload-data"]
   QUALITY_ORDER = { "high" => 1, "medium" => 2, "low" => 3 }
-  END_STATES = ['STOPPED', 'SUCCEEDED', 'FAILED', 'SKIPPED']
   
   EMBED_SIZE = {:medium => 600}
   AUDIO_HEIGHT = 50
@@ -126,26 +107,6 @@ class MasterFile < ActiveFedora::Base
     reloadTechnicalMetadata!
   end
 
-  def set_workflow( workflow  = nil )
-    if workflow == 'skip_transcoding'
-      workflow = case self.file_format
-                 when 'Moving image'
-                  'avalon-skip-transcoding'
-                 when 'Sound' 
-                  'avalon-skip-transcoding-audio'
-                 else
-                  nil
-                 end
-    elsif self.file_format == 'Sound'
-      workflow = 'fullaudio'
-    elsif self.file_format == 'Moving image'
-      workflow = 'avalon'
-    else
-      logger.warn "Could not find workflow for: #{self}"
-    end
-    self.workflow_name = workflow
-  end
-
   alias_method :'_mediaobject=', :'mediaobject='
 
   # This requires the MasterFile having an actual pid
@@ -163,14 +124,9 @@ class MasterFile < ActiveFedora::Base
     end
   end
 
-  def delete 
-    # Stops all processing and deletes the workflow
-    unless workflow_id.blank? || new_object? || finished_processing?
-      begin
-        Rubyhorn.client.stop(workflow_id)
-      rescue Exception => e
-        logger.warn "Error stopping workflow: #{e.message}"
-      end
+  def delete
+    unless new_object? || finished_processing?
+      stop_processing!
     end
 
     mo = self.mediaobject

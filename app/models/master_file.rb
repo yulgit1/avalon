@@ -26,7 +26,7 @@ class MasterFile < ActiveFedora::Base
   include Rails.application.routes.url_helpers
   include Permalink
   include VersionableModel
-  include MatterhornWorkflow
+  include Avalon::MatterhornWorkflow
   
   belongs_to :mediaobject, :class_name=>'MediaObject', :property=>:is_part_of
   has_many :derivatives, :class_name=>'Derivative', :property=>:is_derivation_of
@@ -80,6 +80,7 @@ class MasterFile < ActiveFedora::Base
   VIDEO_TYPES = ["application/mp4", "video/mpeg", "video/mpeg2", "video/mp4", "video/quicktime", "video/avi"]
   UNKNOWN_TYPES = ["application/octet-stream", "application/x-upload-data"]
   QUALITY_ORDER = { "high" => 1, "medium" => 2, "low" => 3 }
+  END_STATES = ['STOPPED', 'SUCCEEDED', 'FAILED', 'SKIPPED']
   
   EMBED_SIZE = {:medium => 600}
   AUDIO_HEIGHT = 50
@@ -155,32 +156,7 @@ class MasterFile < ActiveFedora::Base
 
   def process file=nil
     raise "MasterFile is already being processed" if status_code.present? && !finished_processing?
-
-    #Build hash for single file skip transcoding
-    if !file.is_a?(Hash) && (self.workflow_name == 'avalon-skip-transcoding' || self.workflow_name == 'avalon-skip-transcoding-audio')
-      file = {'quality-high' => File.new(file_location)}
-    end
-
-    if file.is_a? Hash
-      files = file.dup
-      files.each_pair {|quality, f| files[quality] = "file://" + URI.escape(File.realpath(f.to_path))}
-      #The hash below has to be symbol keys or else delayed_job chokes
-      Delayed::Job.enqueue MatterhornIngestJob.new({
-	title: pid,
-	flavor: "presenter/source",
-	workflow: self.workflow_name,
-	url: files
-      })
-    else
-      #The hash below has to be string keys or else rubyhorn complains
-      Delayed::Job.enqueue MatterhornIngestJob.new({
-	'url' => "file://" + URI.escape(file_location),
-	'title' => pid,
-	'flavor' => "presenter/source",
-	'filename' => File.basename(file_location),
-	'workflow' => self.workflow_name
-      })
-    end
+    start_processing! file
   end
 
   def status?(value)
@@ -247,61 +223,6 @@ class MasterFile < ActiveFedora::Base
 
   def finished_processing?
     END_STATES.include?(status_code)
-  end
-
-  def update_progress!( params, matterhorn_response )
-
-    response_duration = matterhorn_response.source_tracks(0).duration.try(:first)
-
-    pct = calculate_percent_complete(matterhorn_response)
-    self.percent_complete  = pct[:complete].to_i.to_s
-    self.percent_succeeded = pct[:succeeded].to_i.to_s
-    self.percent_failed    = (pct[:failed].to_i + pct[:stopped].to_i).to_s
-
-    self.status_code = matterhorn_response.state[0]
-    self.failures = matterhorn_response.operations.operation.operation_state.select { |state| state == 'FAILED' }.length.to_s
-    current_operation = matterhorn_response.find_by_terms(:operations,:operation).select { |n| n['state'] == 'INSTANTIATED' }.first.try(:[],'description')
-    current_operation ||= matterhorn_response.find_by_terms(:operations,:operation).select { |n| ['RUNNING','FAILED','SUCCEEDED'].include?n['state'] }.last.try(:[],'description')
-    self.operation = current_operation
-    self.error = matterhorn_response.errors.last
-
-    # Because there is no attribute_changed? in AF
-    # we want to find out if the duration has changed
-    # so we can update it along with the media object.
-    if response_duration && response_duration !=  self.duration
-      self.duration = response_duration
-    end
-
-    save
-  end
-
-  def update_progress_on_success!( matterhorn_response )
-    # First step is to create derivative objects within Fedora for each
-    # derived item. For this we need to pick only those which 
-    # have a 'streaming' tag attached
-    derivative_data = Hash.new { |h,k| h[k] = {} }
-    0.upto(matterhorn_response.streaming_tracks.size-1) { |i|
-      track = matterhorn_response.streaming_tracks(i)
-      key = track.tags.tag.include?('hls') ? 'hls' : 'rtmp'
-      derivative_data[track.tags.quality.first.split('-').last][key] = track
-    }
-
-    derivative_data.each_pair do |quality, entries|
-      Derivative.create_from_master_file(self, quality, entries, { stream_base: matterhorn_response.stream_base.first })
-    end
-    
-    # Some elements of the original file need to be stored as well even 
-    # though they are not being used right now. This includes a checksum 
-    # which can be used to validate the file has not changed. 
-    self.mediapackage_id = matterhorn_response.mediapackage.id.first
-    
-    unless matterhorn_response.source_tracks(0).nil?
-      self.file_checksum = matterhorn_response.source_tracks(0).checksum.first
-    end
-
-    save
-    
-    run_hook :after_processing
   end
 
   alias_method :'_poster_offset=', :'poster_offset='
@@ -486,35 +407,6 @@ class MasterFile < ActiveFedora::Base
     else
       nil
     end
-  end
-
-  def calculate_percent_complete matterhorn_response
-    totals = {
-      :transcode => 70,
-      :distribution => 20,
-      :cleaning => 0,
-      :other => 10
-    }
-
-    operations = matterhorn_response.find_by_terms(:operations, :operation).collect { |op|
-      type = case op['description']
-             when /mp4/ then :transcode
-             when /^Distributing/ then :distribution
-             else :other
-             end
-      { :description => op['description'], :state => op['state'], :type => type } 
-    }
-
-    result = Hash.new { |h,k| h[k] = 0 }
-    operations.each { |op|
-      op[:pct] = (totals[op[:type]].to_f / operations.select { |o| o[:type] == op[:type] }.count.to_f)
-      state = op[:state].downcase.to_sym 
-      result[state] += op[:pct]
-      result[:complete] += op[:pct] if END_STATES.include?(op[:state])
-    }
-    result[:succeeded] += result.delete(:skipped) unless result[:skipped].nil?
-    result.each {|k,v| result[k] = result[k].round }
-    result
   end
 
   def saveOriginal(file, original_name=nil)

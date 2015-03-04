@@ -1,6 +1,6 @@
 module Avalon::Encoder
   class MatterhornEncodingEngine < EncodingEngine
-    def self.submit 
+    def self.submit file, settings 
     end
 
     def self.progress workflow_id

@@ -1,6 +1,6 @@
 module Avalon::Encoder
   class EncodingEngine
-    def self.submit_job
+    def self.submit_job file, settings
       #Implement this
       #Return job id
       nil

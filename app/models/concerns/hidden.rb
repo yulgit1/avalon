@@ -32,8 +32,9 @@ module Avalon
       end
 
       def to_solr(solr_doc = Hash.new, opts = {})
-        solr_doc[Solrizer.default_field_mapper.solr_name("hidden", type: :boolean)] = hidden?
-        super(solr_doc, opts)
+        super.tap do |doc|
+          doc[Solrizer.default_field_mapper.solr_name("hidden", type: :boolean)] = hidden?
+        end
       end
     end
   end

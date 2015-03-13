@@ -1,7 +1,7 @@
   source 'http://rubygems.org'
 
   gem 'iconv'
-  gem 'rails', '~>4.0.3'
+  gem 'rails', '~>4.1'
   gem 'sprockets', '~>2.11.0'
   #gem 'protected_attributes'
   gem 'builder', '~>3.1.0'
@@ -9,7 +9,7 @@
   #gem 'blacklight', '~>5.7'
   #gem 'blacklight', git: 'https://github.com/projectblacklight/blacklight.git', ref: 'd4f2cf5d6917b927d63867f50bb66f6bc5b9577b'
 
-  gem 'hydra', '~>8.0', git: 'https://github.com/projecthydra/hydra.git', branch: '8-0-testing'
+  gem 'hydra', '~>9.0'
   #gem 'hydra-head', '~>7.2.0'
   #gem 'active-fedora', '~> 7.1.0'
   #gem 'om', '~> 3.1.0'
@@ -23,7 +23,8 @@
   gem 'bcrypt-ruby', '~> 3.1.0'
   gem 'kaminari', '~> 0.15.0'
 
-  gem 'avalon-workflow', git: 'https://github.com/avalonmediasystem/avalon-workflow.git', tag: 'v3.2'
+  #gem 'avalon-workflow', git: 'https://github.com/avalonmediasystem/avalon-workflow.git', tag: 'v3.2'
+  gem 'avalon-workflow', path: '../avalon-workflow'
   gem 'mediaelement_rails', git: 'https://github.com/avalonmediasystem/mediaelement_rails.git', tag: 'v3.1'
   gem 'mediaelement-qualityselector', git:'https://github.com/avalonmediasystem/mediaelement-qualityselector.git', tag: 'v3.3'
   gem 'media_element_thumbnail_selector', git: 'https://github.com/avalonmediasystem/media-element-thumbnail-selector', tag: 'v3.2'
@@ -34,12 +35,11 @@
 
   gem 'browse-everything', '0.6.3'
   
-  gem 'roo', git: 'https://github.com/Empact/roo', ref: '9e1b969762cbb80b1c52cfddd848e489f22f468f'
+  gem 'roo', git: 'https://github.com/roo-rb/roo'
 
   gem 'multipart-post'  
   gem 'modal_logic'
   
-  gem 'rubyzip', '0.9.9'
   gem 'hooks'
 
   # microdata
@@ -69,7 +69,7 @@
   gem 'about_page', git: "https://github.com/avalonmediasystem/about_page.git", tag: 'avalon-v3.2'
 
   # You are free to implement your own User/Authentication solution in its place.
-  gem 'devise', '~>3.2.0'
+  gem 'devise', '~>3.4.1'
   #gem 'devise-guests'
   gem 'haml'
 

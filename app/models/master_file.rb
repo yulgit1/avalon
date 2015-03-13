@@ -25,7 +25,7 @@ class MasterFile < ActiveFedora::Base
   include Hooks
   include Rails.application.routes.url_helpers
   include Permalink
-  include VersionableModel
+#  include VersionableModel
   
   WORKFLOWS = ['fullaudio', 'avalon', 'avalon-skip-transcoding', 'avalon-skip-transcoding-audio']
 
@@ -74,7 +74,7 @@ class MasterFile < ActiveFedora::Base
   end
   #validates :file_format, presence: true, exclusion: { in: ['Unknown'], message: "The file was not recognized as audio or video." }
 
-  has_model_version 'R3'
+#  has_model_version 'R3'
   before_save 'update_stills_from_offset!'
 
   define_hooks :after_processing

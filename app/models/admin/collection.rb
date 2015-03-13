@@ -22,7 +22,7 @@ class Admin::Collection < ActiveFedora::Base
   include Hydra::AccessControls::Permissions
   include Hydra::ModelMixins::HybridDelegator
   include ActiveFedora::Associations
-  include VersionableModel
+#  include VersionableModel
 
   has_many :media_objects, property: :is_member_of_collection 
   has_metadata name: 'descMetadata', type: ActiveFedora::SimpleDatastream do |sds|
@@ -49,7 +49,7 @@ class Admin::Collection < ActiveFedora::Base
            to: :defaultRights, prefix: :default
 
   around_save :reindex_members, if: Proc.new{ |c| c.name_changed? or c.unit_changed? }
-  has_model_version 'R3'
+#  has_model_version 'R3'
   after_validation :create_dropbox_directory!, :on => :create
 
   def self.units
@@ -171,11 +171,11 @@ class Admin::Collection < ActiveFedora::Base
     handle_asynchronously :reindex_media_objects
   end
 
-  def to_solr(solr_doc=Hash.new, *args)
-    solr_doc = super(solr_doc)
-    solr_doc[Solrizer.default_field_mapper.solr_name("name", :facetable, type: :string)] = self.name
-    solr_doc[Solrizer.default_field_mapper.solr_name("dropbox_directory_name", :facetable, type: :string)] = self.dropbox_directory_name
-    solr_doc
+  def to_solr(solr_doc=Hash.new, opts = {})
+    super.tap do |solr_doc|
+      solr_doc[Solrizer.default_field_mapper.solr_name("name", :facetable, type: :string)] = self.name
+      solr_doc[Solrizer.default_field_mapper.solr_name("dropbox_directory_name", :facetable, type: :string)] = self.dropbox_directory_name
+    end
   end
 
   def dropbox

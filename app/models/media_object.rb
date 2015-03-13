@@ -20,7 +20,7 @@ class MediaObject < ActiveFedora::Base
   include Hydra::ModelMethods
   include ActiveFedora::Associations
   include Avalon::Workflow::WorkflowModelMixin
-  include VersionableModel
+#  include VersionableModel
   include Permalink
   require 'avalon/controlled_vocabulary'
   
@@ -35,13 +35,17 @@ class MediaObject < ActiveFedora::Base
   
   # Before saving put the pieces into the right order and validate to make sure that
   # there are no syntactic errors
-  before_save 'descMetadata.ensure_identifier_exists!'
+  before_save 'ensure_identifier_exists!'
   before_save 'descMetadata.update_change_date!'
   before_save 'descMetadata.reorder_elements!'
   before_save 'descMetadata.remove_empty_nodes!'
   before_save 'update_permalink_and_dependents'
 
-  has_model_version 'R3'
+  def ensure_identifier_exists!
+    descMetadata.record_identifier = pid if descMetadata.record_identifier.empty? or descMetadata.record_identifier.join.empty?
+  end
+
+#  has_model_version 'R3'
 
   # Call custom validation methods to ensure that required fields are present and
   # that preferred controlled vocabulary standards are used
@@ -342,36 +346,36 @@ class MediaObject < ActiveFedora::Base
   end
   
   def to_solr(solr_doc = Hash.new, opts = {})
-    solr_doc = super(solr_doc, opts)
-    solr_doc[Solrizer.default_field_mapper.solr_name("created_by", :facetable, type: :string)] = self.DC.creator
-    solr_doc[Solrizer.default_field_mapper.solr_name("duration", :displayable, type: :string)] = self.duration
-    solr_doc[Solrizer.default_field_mapper.solr_name("workflow_published", :facetable, type: :string)] = published? ? 'Published' : 'Unpublished'
-    solr_doc[Solrizer.default_field_mapper.solr_name("collection", :symbol, type: :string)] = collection.name if collection.present?
-    solr_doc[Solrizer.default_field_mapper.solr_name("unit", :symbol, type: :string)] = collection.unit if collection.present?
-    indexer = Solrizer::Descriptor.new(:string, :stored, :indexed, :multivalued)
-    solr_doc[Solrizer.default_field_mapper.solr_name("read_access_virtual_group", indexer)] = virtual_read_groups
-    solr_doc["dc_creator_tesim"] = self.creator
-    solr_doc["dc_publisher_tesim"] = self.publisher
-    solr_doc["title_ssort"] = self.title
-    solr_doc["creator_ssort"] = Array(self.creator).join(', ')
-    #Add all searchable fields to the all_text_timv field
-    all_text_values = []
-    all_text_values << solr_doc["title_tesi"]
-    all_text_values << solr_doc["creator_ssim"]
-    all_text_values << solr_doc["contributor_sim"]
-    all_text_values << solr_doc["unit_ssim"]
-    all_text_values << solr_doc["collection_ssim"]
-    all_text_values << solr_doc["summary_ssi"]
-    all_text_values << solr_doc["publisher_sim"]
-    all_text_values << solr_doc["subject_topic_sim"]
-    all_text_values << solr_doc["subject_geographic_sim"]
-    all_text_values << solr_doc["subject_temporal_sim"]
-    all_text_values << solr_doc["genre_sim"]
-    all_text_values << solr_doc["language_sim"]
-    all_text_values << solr_doc["physical_description_si"]
-    all_text_values << solr_doc["date_sim"]
-    solr_doc["all_text_timv"] = all_text_values.flatten
-    return solr_doc
+    super.tap do |solr_doc|
+      solr_doc[Solrizer.default_field_mapper.solr_name("created_by", :facetable, type: :string)] = self.DC.creator
+      solr_doc[Solrizer.default_field_mapper.solr_name("duration", :displayable, type: :string)] = self.duration
+      solr_doc[Solrizer.default_field_mapper.solr_name("workflow_published", :facetable, type: :string)] = published? ? 'Published' : 'Unpublished'
+      solr_doc[Solrizer.default_field_mapper.solr_name("collection", :symbol, type: :string)] = collection.name if collection.present?
+      solr_doc[Solrizer.default_field_mapper.solr_name("unit", :symbol, type: :string)] = collection.unit if collection.present?
+      indexer = Solrizer::Descriptor.new(:string, :stored, :indexed, :multivalued)
+      solr_doc[Solrizer.default_field_mapper.solr_name("read_access_virtual_group", indexer)] = virtual_read_groups
+      solr_doc["dc_creator_tesim"] = self.creator
+      solr_doc["dc_publisher_tesim"] = self.publisher
+      solr_doc["title_ssort"] = self.title
+      solr_doc["creator_ssort"] = Array(self.creator).join(', ')
+      #Add all searchable fields to the all_text_timv field
+      all_text_values = []
+      all_text_values << solr_doc["title_tesi"]
+      all_text_values << solr_doc["creator_ssim"]
+      all_text_values << solr_doc["contributor_sim"]
+      all_text_values << solr_doc["unit_ssim"]
+      all_text_values << solr_doc["collection_ssim"]
+      all_text_values << solr_doc["summary_ssi"]
+      all_text_values << solr_doc["publisher_sim"]
+      all_text_values << solr_doc["subject_topic_sim"]
+      all_text_values << solr_doc["subject_geographic_sim"]
+      all_text_values << solr_doc["subject_temporal_sim"]
+      all_text_values << solr_doc["genre_sim"]
+      all_text_values << solr_doc["language_sim"]
+      all_text_values << solr_doc["physical_description_si"]
+      all_text_values << solr_doc["date_sim"]
+      solr_doc["all_text_timv"] = all_text_values.flatten
+    end
   end
 
   # Other validation to consider adding into future iterations is the ability to

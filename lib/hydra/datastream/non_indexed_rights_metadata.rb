@@ -22,7 +22,7 @@ module Hydra
       include Avalon::AccessControls::Hidden
       include Avalon::AccessControls::VirtualGroups
 
-      def to_solr(solr_doc=Hash.new)
+      def to_solr(solr_doc=Hash.new, opts = {})
         return solr_doc
       end
     end

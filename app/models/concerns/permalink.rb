@@ -16,6 +16,10 @@ module Permalink
 
   extend ActiveSupport::Concern
   
+  included do
+    property :permalink, predicate: ::RDF::Vocab::DataCite.url, multiple: false
+  end
+  
   ActionDispatch::Reloader.to_prepare do
     ::Permalink.class_variable_set(:@@generator, @@generator) if @@generator
   end
@@ -58,19 +62,12 @@ module Permalink
     @@generator.proc = block
   end
 
-  def permalink(query_vars = {})
-    val = self.relationships(:has_permalink).first
+  def get_permalink(query_vars = {})
+    val = self[:permalink]
     if val && query_vars.present?
       val = "#{val}?#{query_vars.to_query}"
     end
     val ? val.to_s : nil
-  end
-
-  def permalink=(value)
-    self.remove_relationship(:has_permalink, nil)
-    if value.present?
-      self.add_relationship(:has_permalink, value, true)
-    end
   end
 
   # wrap this method; do not use this method as a callback

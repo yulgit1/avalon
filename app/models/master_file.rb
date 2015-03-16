@@ -270,7 +270,7 @@ class MasterFile < ActiveFedora::Base
   def embed_code(width, permalink_opts = {})
     begin
       if self.permalink
-        url = self.permalink(permalink_opts)
+        url = self.get_permalink(permalink_opts)
       else
         url = embed_master_file_path(self.pid, only_path: false, protocol: '//')
       end

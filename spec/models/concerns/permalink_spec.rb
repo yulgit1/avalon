@@ -26,7 +26,7 @@ describe Permalink do
       end
 
       it 'returns nil with query variables' do 
-        master_file.permalink({a:'b'}).should be_nil
+        master_file.get_permalink({a:'b'}).should be_nil
       end
     end
 
@@ -35,7 +35,7 @@ describe Permalink do
       let(:permalink_url){ "http://permalink.com/object/#{master_file.pid}" }
       
       before do 
-        master_file.add_relationship(:has_permalink, permalink_url, true)
+        master_file.permalink = permalink_url
       end
       
       it 'returns a string' do
@@ -44,7 +44,7 @@ describe Permalink do
       
       it 'appends query variables to the url' do
         query_var_hash = { urlappend: '/embed' }
-        master_file.permalink(query_var_hash).should == "#{permalink_url}?#{query_var_hash.to_query}"
+        master_file.get_permalink(query_var_hash).should == "#{permalink_url}?#{query_var_hash.to_query}"
       end
     end
 

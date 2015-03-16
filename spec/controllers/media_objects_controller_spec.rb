@@ -250,7 +250,7 @@ describe MediaObjectsController, type: :controller do
     end
 
     it "should fail when id doesn't exist" do
-      delete :destroy, id: 'avalon:this-pid-is-fake'
+      delete :destroy, id: 'this-pid-is-fake'
       expect(response.code).to eq '404'
     end
 
@@ -289,7 +289,7 @@ describe MediaObjectsController, type: :controller do
       end
 
       it "should fail when id doesn't exist" do
-	get 'update_status', id: 'avalon:this-pid-is-fake', status: 'publish'
+	get 'update_status', id: 'this-pid-is-fake', status: 'publish'
 	expect(response.code).to eq '404'
       end
 
@@ -321,7 +321,7 @@ describe MediaObjectsController, type: :controller do
       end
 
       it "should fail when id doesn't exist" do
-	get 'update_status', id: 'avalon:this-pid-is-fake', status: 'unpublish'
+	get 'update_status', id: 'this-pid-is-fake', status: 'unpublish'
 	expect(response.code).to eq '404'
       end
 

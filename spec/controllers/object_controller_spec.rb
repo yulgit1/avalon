@@ -17,7 +17,7 @@ require 'spec_helper'
 describe ObjectController do
   describe "#show" do
     it "should redirect you to root if no object is found" do
-      get :show, id: 'avalon:bad-pid'
+      get :show, id: 'bad-pid'
       response.should redirect_to root_path
     end
 

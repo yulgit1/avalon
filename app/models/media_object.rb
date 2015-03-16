@@ -29,7 +29,7 @@ class MediaObject < ActiveFedora::Base
   belongs_to :governing_policy, :class_name=>'Admin::Collection', :property=>:is_governed_by
   belongs_to :collection, :class_name=>'Admin::Collection', :property=>:is_member_of_collection
 
-  has_metadata name: "descMetadata", type: ModsDocument	
+  contains "descMetadata", class_name: 'ModsDocument'
 
   after_create :after_create
   
@@ -153,11 +153,11 @@ class MediaObject < ActiveFedora::Base
   has_attributes :terms_of_use, datastream: :descMetadata, at: [:terms_of_use], multiple: false
   has_attributes :physical_description, datastream: :descMetadata, at: [:physical_description], multiple: false
   
-  has_metadata name:'displayMetadata', :type =>  ActiveFedora::SimpleDatastream do |sds|
+  contains 'displayMetadata', class_name: 'ActiveFedora::SimpleDatastream' do |sds|
     sds.field :duration, :string
   end
 
-  has_metadata name:'sectionsMetadata', :type =>  ActiveFedora::SimpleDatastream do |sds|
+  contains 'sectionsMetadata', class_name:  'ActiveFedora::SimpleDatastream' do |sds|
     sds.field :section_pid, :string
   end
 

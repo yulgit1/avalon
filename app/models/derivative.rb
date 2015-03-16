@@ -31,7 +31,7 @@ class Derivative < ActiveFedora::Base
   # The only meaningful value at the moment is the url, which points to
   # the stream location. The other two are just stored until a migration
   # strategy is required.
-  has_metadata name: "descMetadata", :type => ActiveFedora::SimpleDatastream do |d|
+  contains "descMetadata", class_name: 'ActiveFedora::SimpleDatastream' do |d|
     d.field :location_url, :string
     d.field :hls_url, :string
     d.field :duration, :string
@@ -39,11 +39,11 @@ class Derivative < ActiveFedora::Base
     d.field :hls_track_id, :string
   end
 
-  has_metadata name: 'derivativeFile', type: UrlDatastream
+  contains 'derivativeFile', class_name: 'UrlDatastream'
 
   has_attributes :location_url, :hls_url, :duration, :track_id, :hls_track_id, datastream: :descMetadata, multiple: false
 
-  has_metadata name: 'encoding', type: EncodingProfileDocument
+  contains 'encoding', class_name: 'EncodingProfileDocument'
 
   def self.url_handler
     url_handler_class = Avalon::Configuration.lookup('streaming.server').to_s.classify

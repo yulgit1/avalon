@@ -25,14 +25,14 @@ class Admin::Collection < ActiveFedora::Base
 #  include VersionableModel
 
   has_many :media_objects, property: :is_member_of_collection 
-  has_metadata name: 'descMetadata', type: ActiveFedora::SimpleDatastream do |sds|
+  contains 'descMetadata', class_name: 'ActiveFedora::SimpleDatastream' do |sds|
     sds.field :name, :string
     sds.field :unit, :string
     sds.field :description, :string
     sds.field :dropbox_directory_name
   end
-  has_metadata name: 'inheritedRights', type: Hydra::Datastream::InheritableRightsMetadata
-  has_metadata name: 'defaultRights', type: Hydra::Datastream::NonIndexedRightsMetadata, autocreate: true
+  contains 'inheritedRights', class_name: 'Hydra::Datastream::InheritableRightsMetadata'
+  contains 'defaultRights', class_name: 'Hydra::Datastream::NonIndexedRightsMetadata', autocreate: true
 
   validates :name, :uniqueness => { :solr_name => 'name_sim'}, presence: true
   validates :unit, presence: true, inclusion: { in: Proc.new{ Admin::Collection.units } }

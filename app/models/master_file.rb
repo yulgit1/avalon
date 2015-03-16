@@ -32,7 +32,7 @@ class MasterFile < ActiveFedora::Base
   belongs_to :mediaobject, :class_name=>'MediaObject', :property=>:is_part_of
   has_many :derivatives, :class_name=>'Derivative', :property=>:is_derivation_of
 
-  has_metadata name: 'descMetadata', :type => ActiveFedora::SimpleDatastream do |d|
+  contains 'descMetadata', class_name: 'ActiveFedora::SimpleDatastream' do |d|
     d.field :file_location, :string
     d.field :file_checksum, :string
     d.field :file_size, :string
@@ -44,7 +44,7 @@ class MasterFile < ActiveFedora::Base
     d.field :thumbnail_offset, :string
   end
 
-  has_metadata name: 'mhMetadata', :type => ActiveFedora::SimpleDatastream do |d|
+  contains 'mhMetadata', class_name: 'ActiveFedora::SimpleDatastream' do |d|
     d.field :workflow_id, :string
     d.field :workflow_name, :string
     d.field :mediapackage_id, :string
@@ -57,7 +57,7 @@ class MasterFile < ActiveFedora::Base
     d.field :failures, :string
   end
 
-  has_metadata name: 'masterFile', type: UrlDatastream
+  contains 'masterFile', class_name: 'UrlDatastream'
 
   has_attributes :file_checksum, :file_size, :duration, :display_aspect_ratio, :original_frame_size, :file_format, :poster_offset, :thumbnail_offset, datastream: :descMetadata, multiple: false
   has_attributes :workflow_id, :workflow_name, :mediapackage_id, :percent_complete, :percent_succeeded, :percent_failed, :status_code, :operation, :error, :failures, datastream: :mhMetadata, multiple: false

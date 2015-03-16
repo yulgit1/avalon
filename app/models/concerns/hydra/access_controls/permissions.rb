@@ -5,7 +5,7 @@ module Hydra
 
       included do
         include Hydra::AccessControls::Visibility
-        has_metadata "rightsMetadata", type: Hydra::Datastream::RightsMetadata
+        contains "rightsMetadata", class_name: 'Hydra::Datastream::RightsMetadata'
       end
 
       ## Updates those permissions that are provided to it. Does not replace any permissions unless they are provided

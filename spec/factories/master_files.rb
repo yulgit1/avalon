@@ -17,7 +17,9 @@ FactoryGirl.define do
     file_location {'/path/to/video.mp4'}
     percent_complete {"#{rand(100)}"}
     workflow_name 'avalon'
-    mediaobject {FactoryGirl.create(:media_object)}
+    after(:create) do |mf|
+      mf.mediaobject = FactoryGirl.create(:media_object) unless mf.mediaobject.present?
+    end
 
     factory :master_file_with_derivative do
       workflow_name 'avalon'

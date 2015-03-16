@@ -24,6 +24,13 @@ GIT
       mediainfo
 
 GIT
+  remote: https://github.com/avalonmediasystem/avalon-workflow.git
+  revision: 5a99b4797bb4401a101d6bb2bc582f0f7382ebb9
+  branch: feature/hydra9
+  specs:
+    avalon-workflow (0.0.3)
+
+GIT
   remote: https://github.com/avalonmediasystem/felixwrapper.git
   revision: 2ae939d4811bc245d9f80c6a3f6cf6cc70d8c5b4
   tag: v3.1
@@ -123,11 +130,6 @@ GIT
     roo (2.0.0)
       nokogiri
       rubyzip (>= 1.0.0)
-
-PATH
-  remote: ../avalon-workflow
-  specs:
-    avalon-workflow (0.0.3)
 
 GEM
   remote: http://rubygems.org/

@@ -124,6 +124,23 @@ GIT
       rest-client
 
 GIT
+  remote: https://github.com/mbklein/active_fedora.git
+  revision: c7b6551935980172e8b9ae33fbc22adef3a2d023
+  branch: add-as-to-hm-reflection
+  specs:
+    active-fedora (9.0.4)
+      active-triples (~> 0.6.0)
+      activesupport (>= 4.1.0)
+      deprecation
+      ldp (~> 0.2.1)
+      linkeddata
+      nom-xml (>= 0.5.1)
+      om (~> 3.1)
+      rdf-ldp
+      rdf-rdfxml (~> 1.1.0)
+      rsolr (~> 1.0.10)
+
+GIT
   remote: https://github.com/roo-rb/roo
   revision: 707ed1524dd4506e553c6528a674add910598395
   specs:
@@ -153,17 +170,6 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.1)
-    active-fedora (9.0.4)
-      active-triples (~> 0.6.0)
-      activesupport (>= 4.1.0)
-      deprecation
-      ldp (~> 0.2.1)
-      linkeddata
-      nom-xml (>= 0.5.1)
-      om (~> 3.1)
-      rdf-ldp
-      rdf-rdfxml (~> 1.1.0)
-      rsolr (~> 1.0.10)
     active-triples (0.6.1)
       activemodel (>= 3.0.0)
       activesupport (>= 3.0.0)
@@ -741,6 +747,7 @@ PLATFORMS
 
 DEPENDENCIES
   about_page!
+  active-fedora!
   activerecord-jdbcsqlite3-adapter
   activerecord-session_store
   avalon-about!

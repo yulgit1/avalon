@@ -93,12 +93,12 @@ describe MasterFile do
       mf.save
       derivative.save
 
-      mf.relationships(:is_derivation_of).size.should == 0
-
+      mf.derivatives.should be_empty
       mf.derivatives += [derivative]
+      derivative.save
+      mf.reload
 
-      derivative.relationships(:is_derivation_of).size.should == 1
-      derivative.relationships(:is_derivation_of).first.should == mf.internal_uri
+      derivative.masterfile_id.should eq mf.id
 
       #derivative.relationships_are_dirty.should be true
     end

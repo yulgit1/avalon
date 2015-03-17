@@ -25,9 +25,9 @@ class MediaObject < ActiveFedora::Base
   require 'avalon/controlled_vocabulary'
   
   # has_relationship "parts", :has_part
-  has_many :parts, :class_name=>'MasterFile', :property=>:is_part_of
-  belongs_to :governing_policy, :class_name=>'Admin::Collection', :property=>:is_governed_by
-  belongs_to :collection, :class_name=>'Admin::Collection', :property=>:is_member_of_collection
+  has_many :parts, :class_name=>'MasterFile', :as=>:mediaobject, :predicate=>ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
+  belongs_to :governing_policy, :class_name=>'Admin::Collection', :predicate=>ActiveFedora::RDF::ProjectHydra.isGovernedBy
+  belongs_to :collection, :class_name=>'Admin::Collection', :predicate=>ActiveFedora::RDF::Fcrepo::RelsExt.isMemberOfCollection
 
   contains "descMetadata", class_name: 'ModsDocument'
 

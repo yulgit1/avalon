@@ -29,8 +29,8 @@ class MasterFile < ActiveFedora::Base
   
   WORKFLOWS = ['fullaudio', 'avalon', 'avalon-skip-transcoding', 'avalon-skip-transcoding-audio']
 
-  belongs_to :mediaobject, :class_name=>'MediaObject', :property=>:is_part_of
-  has_many :derivatives, :class_name=>'Derivative', :property=>:is_derivation_of
+  belongs_to :mediaobject, :class_name=>'MediaObject', :predicate=>ActiveFedora::RDF::Fcrepo::RelsExt.isPartOf
+  has_many :derivatives, :class_name=>'Derivative', :as=>:masterfile, :predicate=>ActiveFedora::RDF::Fcrepo::RelsExt.isDerivationOf
 
   contains 'descMetadata', class_name: 'ActiveFedora::SimpleDatastream' do |d|
     d.field :file_location, :string
@@ -153,13 +153,11 @@ class MasterFile < ActiveFedora::Base
     # Removes existing association
     if self.mediaobject.present?
       self.mediaobject.parts_with_order_remove self
-      self.mediaobject.parts -= [self]
     end
 
     self._mediaobject=(mo)
     unless self.mediaobject.nil?
       self.mediaobject.parts_with_order += [self]
-      self.mediaobject.parts += [self]
     end
   end
 

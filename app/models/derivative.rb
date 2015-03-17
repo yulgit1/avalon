@@ -20,7 +20,7 @@ class Derivative < ActiveFedora::Base
 
   class_attribute :url_handler
 
-  belongs_to :masterfile, :class_name=>'MasterFile', :property=>:is_derivation_of
+  belongs_to :masterfile, :class_name=>'MasterFile', :predicate=>ActiveFedora::RDF::Fcrepo::RelsExt.isDerivationOf
 
 #  has_model_version 'R3'
 

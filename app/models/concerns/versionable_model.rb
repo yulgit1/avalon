@@ -24,6 +24,10 @@ module VersionableModel
       self.before_save :update_current_version!
     end
   end
+  
+  included do
+    property :current_version, predicate: ::RDF::OWL.versionInfo, multiple: false
+  end
 
   def update_current_version!
     if self.class.model_version and not @auto_versioning_disabled
@@ -41,20 +45,11 @@ module VersionableModel
     end
   end
 
-  def current_version
-    val = self.relationships(:has_model_version).first
-    val ? val.to_s : nil
+  def current_migration
+    self.current_migration
   end
-
-  def current_version=(value)
-    self.remove_relationship(:has_model_version, nil)
-    if value.present?
-      self.add_relationship(:has_model_version, value, true)
-    end
-    self.rels_ext.serialize!
+  
+  def current_migration= *args
+    self.send(:current_migration, *args)
   end
-
-  alias_method :current_migration, :current_version
-  alias_method :current_migration=, :current_version=
-
 end

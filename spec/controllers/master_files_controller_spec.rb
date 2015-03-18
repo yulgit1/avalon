@@ -133,9 +133,9 @@ describe MasterFilesController do
         Rubyhorn.stub_chain(:client,:get).and_return(nil)
         Rubyhorn.stub_chain(:client,:stop).and_return(true)
         #Thumbnail and poster datastreams must have some content for saving to succeed
-        master_file.thumbnail.mimeType = 'image/png'
+        master_file.thumbnail.mime_type = 'image/png'
         master_file.thumbnail.content = 'PNG'
-        master_file.poster.mimeType = 'image/png'
+        master_file.poster.mime_type = 'image/png'
         master_file.poster.content = 'PNG'
         master_file.save 
     end

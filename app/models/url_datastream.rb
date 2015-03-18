@@ -14,7 +14,7 @@
 
 class UrlDatastream < ActiveFedora::Datastream
   def self.default_attributes
-    super.merge(:controlGroup => 'M', :mimeType => 'text/url', :label => 'URL')
+    super.merge(:controlGroup => 'M', :mime_type => 'text/url', :label => 'URL')
   end
 
   def location

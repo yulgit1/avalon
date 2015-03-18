@@ -24,7 +24,7 @@ describe UrlDatastream do
 
   describe "uninitialized" do
     it "should have default properties" do 
-      expect(subject.mimeType).to eq('text/url')
+      expect(subject.mime_type).to eq('text/url')
       expect(subject.controlGroup).to eq('M')
       expect(subject.location).to be_nil
     end

@@ -212,7 +212,7 @@ class MasterFilesController < ApplicationController
   def get_frame
     master_file = MasterFile.find(params[:id])
     parent = master_file.mediaobject
-    mimeType = "image/jpeg"
+    mime_type = "image/jpeg"
     content = if params[:offset]
       authorize! :edit, parent, message: "You do not have sufficient privileges to view this file"
       opts = { :type => params[:type], :size => params[:size], :offset => params[:offset].to_f*1000, :preview => true }
@@ -220,10 +220,10 @@ class MasterFilesController < ApplicationController
     else
       authorize! :read, parent, message: "You do not have sufficient privileges to view this file"
       ds = master_file.datastreams[params[:type]]
-      mimeType = ds.mimeType
+      mime_type = ds.mime_type
       ds.content
     end
-    send_data content, :filename => "#{params[:type]}-#{master_file.pid.split(':')[1]}", :disposition => :inline, :type => mimeType
+    send_data content, :filename => "#{params[:type]}-#{master_file.pid.split(':')[1]}", :disposition => :inline, :type => mime_type
   end
 
 protected

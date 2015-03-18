@@ -409,7 +409,7 @@ class MasterFile < ActiveFedora::Base
         ds = self.datastreams[type]
         result = extract_frame(options.merge(:size => frame_size))
         unless options[:preview]
-          ds.mimeType = 'image/jpeg'
+          ds.mime_type = 'image/jpeg'
           ds.content = StringIO.new(result)
         end
       end

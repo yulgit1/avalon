@@ -124,9 +124,8 @@ GIT
       rest-client
 
 GIT
-  remote: https://github.com/mbklein/active_fedora.git
-  revision: c7b6551935980172e8b9ae33fbc22adef3a2d023
-  branch: add-as-to-hm-reflection
+  remote: https://github.com/projecthydra/active_fedora.git
+  revision: c0885c2d3ea8ccf61ab8236c40d77fd369ea0ed9
   specs:
     active-fedora (9.0.4)
       active-triples (~> 0.6.0)

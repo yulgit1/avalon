@@ -11,7 +11,7 @@
 
   gem 'hydra', '~>9.0'
   gem 'rdf-vocab'
-  gem 'active-fedora', git: 'https://github.com/mbklein/active_fedora.git', branch: 'add-as-to-hm-reflection'
+  gem 'active-fedora', git: 'https://github.com/projecthydra/active_fedora.git'
   #gem 'hydra-head', '~>7.2.0'
   #gem 'active-fedora', '~> 7.1.0'
   #gem 'om', '~> 3.1.0'

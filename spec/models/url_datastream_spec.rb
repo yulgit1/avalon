@@ -16,7 +16,7 @@ require 'spec_helper'
 
 describe UrlDatastream do
   let(:test_object) { obj = ActiveFedora::Base.new ; obj.save ; obj      }
-  subject           { UrlDatastream.new(test_object.inner_object, 'foo') }
+  subject           { UrlDatastream.new(test_object, 'foo') }
 
   after :each do
     test_object.destroy
@@ -25,7 +25,6 @@ describe UrlDatastream do
   describe "uninitialized" do
     it "should have default properties" do 
       expect(subject.mime_type).to eq('text/url')
-      expect(subject.controlGroup).to eq('M')
       expect(subject.location).to be_nil
     end
   end

@@ -13,10 +13,6 @@
 # ---  END LICENSE_HEADER BLOCK  ---
 
 class UrlDatastream < ActiveFedora::Datastream
-  def self.default_attributes
-    super.merge(:controlGroup => 'M', :mime_type => 'text/url', :label => 'URL')
-  end
-
   def location
     self.content
   end
@@ -24,5 +20,11 @@ class UrlDatastream < ActiveFedora::Datastream
   def location=(value)
     URI.parse(value) unless value.nil?
     self.content = value
+  end
+
+  protected
+
+  def default_mime_type
+    'text/url'
   end
 end

@@ -19,6 +19,7 @@ FactoryGirl.define do
     workflow_name 'avalon'
     after(:create) do |mf|
       mf.mediaobject = FactoryGirl.create(:media_object) unless mf.mediaobject.present?
+      mf.save
     end
 
     factory :master_file_with_derivative do

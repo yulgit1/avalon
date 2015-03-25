@@ -33,6 +33,7 @@ class MasterFile < ActiveFedora::Base
   has_many :derivatives, :class_name=>'Derivative', :as=>:masterfile, :predicate=>ActiveFedora::RDF::Fcrepo::RelsExt.isDerivationOf
 
   contains 'descMetadata', class_name: 'ActiveFedora::SimpleDatastream' do |d|
+    d.field :label, :string
     d.field :file_location, :string
     d.field :file_checksum, :string
     d.field :file_size, :string
@@ -59,7 +60,7 @@ class MasterFile < ActiveFedora::Base
 
   contains 'masterFile', class_name: 'UrlDatastream'
 
-  has_attributes :file_checksum, :file_size, :duration, :display_aspect_ratio, :original_frame_size, :file_format, :poster_offset, :thumbnail_offset, datastream: :descMetadata, multiple: false
+  has_attributes :label, :file_checksum, :file_size, :duration, :display_aspect_ratio, :original_frame_size, :file_format, :poster_offset, :thumbnail_offset, datastream: :descMetadata, multiple: false
   has_attributes :workflow_id, :workflow_name, :mediapackage_id, :percent_complete, :percent_succeeded, :percent_failed, :status_code, :operation, :error, :failures, datastream: :mhMetadata, multiple: false
 
   has_file_datastream name: 'thumbnail'
@@ -148,7 +149,7 @@ class MasterFile < ActiveFedora::Base
 
   alias_method :'_mediaobject=', :'mediaobject='
 
-  # This requires the MasterFile having an actual pid
+  # This requires the MasterFile having an actual id
   def mediaobject=(mo)
     # Removes existing association
     if self.mediaobject.present?
@@ -163,7 +164,7 @@ class MasterFile < ActiveFedora::Base
 
   def delete 
     # Stops all processing and deletes the workflow
-    unless workflow_id.blank? || new_object? || finished_processing?
+    unless workflow_id.blank? || new_record? || finished_processing?
       begin
         Rubyhorn.client.stop(workflow_id)
       rescue Exception => e
@@ -208,7 +209,7 @@ class MasterFile < ActiveFedora::Base
       files.each_pair {|quality, f| files[quality] = "file://" + URI.escape(File.realpath(f.to_path))}
       #The hash below has to be symbol keys or else delayed_job chokes
       Delayed::Job.enqueue MatterhornIngestJob.new({
-	title: pid,
+	title: id,
 	flavor: "presenter/source",
 	workflow: self.workflow_name,
 	url: files
@@ -217,7 +218,7 @@ class MasterFile < ActiveFedora::Base
       #The hash below has to be string keys or else rubyhorn complains
       Delayed::Job.enqueue MatterhornIngestJob.new({
 	'url' => "file://" + URI.escape(file_location),
-	'title' => pid,
+	'title' => id,
 	'flavor' => "presenter/source",
 	'filename' => File.basename(file_location),
 	'workflow' => self.workflow_name
@@ -251,7 +252,7 @@ class MasterFile < ActiveFedora::Base
     flash = sort_streams flash
     hls = sort_streams hls
 
-    poster_path = Rails.application.routes.url_helpers.poster_master_file_path(self) unless poster.new?
+    poster_path = Rails.application.routes.url_helpers.poster_master_file_path(self) if poster.present?
 
     # Returns the hash
     {
@@ -270,7 +271,7 @@ class MasterFile < ActiveFedora::Base
       if self.permalink
         url = self.get_permalink(permalink_opts)
       else
-        url = embed_master_file_path(self.pid, only_path: false, protocol: '//')
+        url = embed_master_file_path(self.id, only_path: false, protocol: '//')
       end
       height = is_video? ? (width/display_aspect_ratio.to_f).floor : AUDIO_HEIGHT
       "<iframe src=\"#{url}\" width=\"#{width}\" height=\"#{height}\" frameborder=\"0\" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>"
@@ -381,11 +382,11 @@ class MasterFile < ActiveFedora::Base
   def update_stills_from_offset!
     if @stills_to_update.present?
       # Update stills together
-      self.class.extract_still(self.pid, :type => 'both', :offset => self.poster_offset)
+      self.class.extract_still(self.id, :type => 'both', :offset => self.poster_offset)
 
       # Update stills independently
       # @stills_to_update.each do |type|
-      #   self.class.extract_still(self.pid, :type => type, :offset => self.send("#{type}_offset"))
+      #   self.class.extract_still(self.id, :type => type, :offset => self.send("#{type}_offset"))
       # end
       @stills_to_update = []
     end
@@ -419,8 +420,8 @@ class MasterFile < ActiveFedora::Base
   end
 
   class << self
-    def extract_still(pid, options={})
-      obj = self.find(pid)
+    def extract_still(id, options={})
+      obj = self.find(id)
       obj.extract_still(options)
     end
     handle_asynchronously :extract_still
@@ -476,7 +477,7 @@ class MasterFile < ActiveFedora::Base
 
   def extract_frame(options={})
     if is_video?
-      base = pid.gsub(/:/,'_')
+      base = id.gsub(/:/,'_')
       offset = options[:offset].to_i
       unless offset.between?(0,self.duration.to_i)
         raise RangeError, "Offset #{offset} not in range 0..#{self.duration}"
@@ -617,19 +618,19 @@ class MasterFile < ActiveFedora::Base
 
     case Avalon::Configuration.lookup('master_file_management.strategy')
     when 'delete'
-      AvalonJobs.delete_masterfile self.pid
+      AvalonJobs.delete_masterfile self.id
     when 'move'
       move_path = Avalon::Configuration.lookup('master_file_management.path')
       raise '"path" configuration missing for master_file_management strategy "move"' if move_path.blank?
-      newpath = File.join(move_path, post_processing_move_filename(file_location, pid: self.pid))
-      AvalonJobs.move_masterfile self.pid, newpath
+      newpath = File.join(move_path, post_processing_move_filename(file_location, id: self.id))
+      AvalonJobs.move_masterfile self.id, newpath
     else
       # Do nothing
     end
   end
 
   def post_processing_move_filename(oldpath, options={})
-    "#{options[:pid].gsub(":","_")}-#{File.basename(oldpath)}"
+    "#{options[:id].gsub(":","_")}-#{File.basename(oldpath)}"
   end
 
 end

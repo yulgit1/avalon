@@ -23,7 +23,7 @@ class StreamToken < ActiveRecord::Base
 
   def self.find_or_create_session_token(session, target)
     self.purge_expired!
-    result = self.find_or_create_by_token_and_target(media_token(session), target)
+    result = self.find_or_create_by(token: media_token(session), target: target)
     result.renew!
     result.token
   end

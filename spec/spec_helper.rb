@@ -98,6 +98,9 @@ RSpec.configure do |config|
   config.after(:each) do
     Rails.cache.clear
     DatabaseCleaner.clean
+    Derivative.destroy_all
+    MasterFile.destroy_all
+    MediaObject.destroy_all
     ActiveFedora::Base.destroy_all
    end 
 

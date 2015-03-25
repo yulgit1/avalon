@@ -18,7 +18,7 @@ describe Permalink do
 
   describe '#permalink' do
     
-    let(:master_file){ FactoryGirl.build(:master_file) }
+    let(:master_file){ FactoryGirl.create(:master_file) }
 
     context 'permalink does not exist' do
       it 'returns nil' do

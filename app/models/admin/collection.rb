@@ -141,6 +141,10 @@ class Admin::Collection < ActiveFedora::Base
   def self.reassign_media_objects( media_objects, source_collection, target_collection)
     source_collection.media_objects -= Array(media_objects)
     target_collection.media_objects += Array(media_objects)
+    media_objects.each do |m| 
+      m.collection = target_collection
+      m.save(validate: false)
+    end
     
     source_collection.save!
     target_collection.save!

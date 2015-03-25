@@ -375,7 +375,12 @@ describe Admin::Collection do
       incomplete_object = MediaObject.new
       incomplete_object.save(validate: false)
       @media_objects << incomplete_object
-      @source_collection = FactoryGirl.build(:collection, media_objects: @media_objects)
+      @source_collection = FactoryGirl.create(:collection)
+      @media_objects.each do |m|
+        m.collection = @source_collection
+        m.save(validate: false)
+        m.reload
+      end
       @source_collection.save(:validate => false)
       @target_collection = FactoryGirl.create(:collection)
       Admin::Collection.reassign_media_objects(@media_objects, @source_collection, @target_collection)

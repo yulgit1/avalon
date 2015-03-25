@@ -185,7 +185,7 @@ class CatalogController < ApplicationController
   
   def only_wanted_models(solr_parameters, user_parameters)
     solr_parameters[:fq] ||= []
-    solr_parameters[:fq] << 'has_model_ssim:"info:fedora/afmodel:MediaObject"'
+    solr_parameters[:fq] << 'has_model_ssim:"MediaObject"'
   end
 
   def only_published_items(solr_parameters, user_parameters)

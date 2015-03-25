@@ -25,7 +25,7 @@ describe FileUploadStep do
     it 'should be able to set a blank label' do
       step_context = {mediaobject: mediaobject, parts: {masterfile.pid => {label: ''}}}
       FileUploadStep.new.update_master_files(step_context)
-      expect(masterfile.reload.label).to be_nil
+      expect(masterfile.reload.label).to_not be_present
     end
   end
 end

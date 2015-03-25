@@ -6,13 +6,13 @@
   #gem 'protected_attributes'
   gem 'builder', '~>3.1.0'
 
-  #gem 'blacklight', '~>5.7'
+  gem 'blacklight', '~>5.9'
   #gem 'blacklight', git: 'https://github.com/projectblacklight/blacklight.git', ref: 'd4f2cf5d6917b927d63867f50bb66f6bc5b9577b'
 
-  gem 'hydra', '~>9.0'
+  #gem 'hydra', '~>9.0'
   gem 'rdf-vocab'
   gem 'active-fedora', git: 'https://github.com/projecthydra/active_fedora.git'
-  #gem 'hydra-head', '~>7.2.0'
+  gem 'hydra-head', '~>9.1'
   #gem 'active-fedora', '~> 7.1.0'
   #gem 'om', '~> 3.1.0'
   #gem 'solrizer', '~> 3.3.0'

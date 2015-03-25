@@ -50,7 +50,7 @@ class Admin::Collection < ActiveFedora::Base
 
   around_save :reindex_members, if: Proc.new{ |c| c.name_changed? or c.unit_changed? }
 #  has_model_version 'R3'
-  after_validation :create_dropbox_directory!, :on => :create
+  before_create :create_dropbox_directory!
 
   def self.units
     Avalon::ControlledVocabulary.find_by_name(:units) || []

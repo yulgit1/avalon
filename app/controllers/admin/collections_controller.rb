@@ -64,7 +64,7 @@ class Admin::CollectionsController < ApplicationController
  
   # POST /collections
   def create
-    @collection = Admin::Collection.create(params[:admin_collection].merge(managers: [user_key]))
+    @collection = Admin::Collection.create(collection_params.merge(managers: [user_key]))
     if @collection.persisted?
       User.where(username: [RoleControls.users('administrator')].flatten).each do |admin_user|
         NotificationsMailer.delay.new_collection( 
@@ -183,5 +183,10 @@ class Admin::CollectionsController < ApplicationController
       flash[:notice] = "Something went wrong. #{@source_collection.name} is not empty."
       redirect_to admin_collection_path(@source_collection)
     end
+  end
+
+  private
+  def collection_params
+    params.require(:admin_collection).permit(:name, :description, :unit)
   end
 end

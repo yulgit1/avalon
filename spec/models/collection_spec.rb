@@ -136,7 +136,6 @@ describe Admin::Collection do
     its(:name) {should == "Herman B. Wells Collection"}
     its(:unit) {should == "University Archives"}
     its(:description) {should == "Collection about our 11th university president, 1938-1962"}
-    its(:created_at) {should == DateTime.parse(wells_collection.create_date)}
     its(:managers) {should == [manager.username]}
     its(:editors) {should == [editor.username]}
     its(:depositors) {should == [depositor.username]}
@@ -383,7 +382,8 @@ describe Admin::Collection do
     end
 
     it 'sets the new collection on media_object' do
-      @media_objects.each{|m| m.collection.should eql @target_collection }
+      @media_objects.map(&:reload)
+      @media_objects.each{|m| m.collection.id.should eql @target_collection.id }
     end
 
     it 'removes the media object from the source collection' do

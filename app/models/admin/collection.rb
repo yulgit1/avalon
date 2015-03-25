@@ -56,10 +56,6 @@ class Admin::Collection < ActiveFedora::Base
     Avalon::ControlledVocabulary.find_by_name(:units) || []
   end
 
-  def created_at
-    @created_at ||= DateTime.parse(create_date)
-  end
-
   def managers
     edit_users & ( RoleControls.users("manager") | (RoleControls.users("administrator") || []) )
   end
@@ -143,17 +139,9 @@ class Admin::Collection < ActiveFedora::Base
   end
 
   def self.reassign_media_objects( media_objects, source_collection, target_collection)
-    media_objects.dup.each do |media_object|
-      
-      source_collection.remove_relationship(:is_member_of_collection, "info:fedora/#{media_object.pid}")
-      source_collection.media_objects.delete media_object
-
-      target_collection.add_relationship(:is_member_of_collection, "info:fedora/#{media_object.pid}")
-      target_collection.media_objects << media_object
-
-      media_object.collection = target_collection
-      media_object.save(validate: false)
-    end
+    source_collection.media_objects -= Array(media_objects)
+    target_collection.media_objects += Array(media_objects)
+    
     source_collection.save!
     target_collection.save!
   end

@@ -107,6 +107,7 @@ namespace :avalon do
 
   desc "Reindex all Avalon objects"
   task :reindex => :environment do
+    #FIXME This task needs to be updated for Hydra9
     query = "pid~#{Avalon::Configuration.lookup('fedora.namespace')}:*"
     #Override of ActiveFedora::Base.reindex_everything("pid~#{prefix}:*") including error handling/reporting
     ActiveFedora::Base.send(:connections).each do |conn|

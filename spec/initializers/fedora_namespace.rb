@@ -14,15 +14,12 @@
 
 require 'spec_helper'
 
-describe 'PID Assignment' do
-  let(:repo)      { ActiveFedora::Base.connection_for_pid(0) }
+describe 'ID Assignment' do
   let(:namespace) { Avalon::Configuration.lookup('fedora.namespace') }
-  let(:pid)       { "#{namespace}:12345" }
-  
-  it "should assign a PID in the correct namespace" do
-    expect(repo).to receive(:mint).with({ namespace: namespace }).and_return(pid)
-    mo = MediaObject.new
-    mo.send(:assign_pid)
-    expect(mo.pid).to eq(pid)
+  let(:id)       { "12345" }
+  subject(:object) { ActiveFedora::Base.create(id) }
+  it "should assign an id in the correct namespace" do
+    expect(object.id).to eq(id)
+    expect(object.uri).to eq("#{ActiveFedora.fedora.host}/test/#{namespace}/#{id}")
   end
 end

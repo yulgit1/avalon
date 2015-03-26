@@ -23,15 +23,15 @@ describe Derivative do
       mf.save
       derivative.save
 
-      mf.derivatives.should be_empty
-      derivative.masterfile.should be_nil
+      expect(mf.derivatives).to be_empty
+      expect(derivative.masterfile).to be_nil
 
       derivative.masterfile = mf
       derivative.save
       mf.reload
 
-      mf.derivative_ids.should == [derivative.id]
-      derivative.masterfile_id.should eq mf.id
+      expect(mf.derivative_ids).to eq([derivative.id])
+      expect(derivative.masterfile_id).to eq mf.id
     end
   end
 
@@ -51,18 +51,18 @@ describe Derivative do
       log_count = 0
       file = File.new(Avalon::Configuration.lookup('matterhorn.cleanup_log'))
       file.each { |line| log_count += 1 if line.start_with?(job_urls[0]) || line.start_with?(job_urls[1]) }
-      log_count.should == 2
+      expect(log_count).to eq(2)
     end 
 
     it "should not throw error when location_url is missing" do
       derivative.location_url = nil
       derivative.delete
-      Derivative.all.count.should == 0
+      expect(Derivative.all.count).to eq(0)
     end
 
     it "should not throw error when workflow doesn't exist in Matterhorn" do
       derivative.delete
-      Derivative.all.count.should == 0
+      expect(Derivative.all.count).to eq(0)
     end
 
     it "should delete even if retraction fails (VOV-1356)" do
@@ -89,22 +89,22 @@ describe Derivative do
 
       it "should properly create an RTMP video streaming URL" do
         @d.encoding.video = 'true'
-        @d.streaming_url(false).should == "#{@rtmp_base}/mp4:c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content"
+        expect(@d.streaming_url(false)).to eq("#{@rtmp_base}/mp4:c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content")
       end
 
       it "should properly create an RTMP audio streaming URL" do
         @d.encoding.audio = 'true'
-        @d.streaming_url(false).should == "#{@rtmp_base}/mp4:c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content"
+        expect(@d.streaming_url(false)).to eq("#{@rtmp_base}/mp4:c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content")
       end
 
       it "should properly create an HTTP video streaming URL" do
         @d.encoding.video = 'true'
-        @d.streaming_url(true).should == "#{@http_base}/c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content.mp4.m3u8"
+        expect(@d.streaming_url(true)).to eq("#{@http_base}/c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content.mp4.m3u8")
       end
 
       it "should properly create an HTTP audio streaming URL" do
         @d.encoding.audio = 'true'
-        @d.streaming_url(true).should == "#{@http_base}/c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content.mp4.m3u8"
+        expect(@d.streaming_url(true)).to eq("#{@http_base}/c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content.mp4.m3u8")
       end
     end
 
@@ -115,22 +115,22 @@ describe Derivative do
 
       it "should properly create an RTMP video streaming URL" do
         @d.encoding.video = 'true'
-        @d.streaming_url(false).should == "#{@rtmp_base}/mp4:c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content"
+        expect(@d.streaming_url(false)).to eq("#{@rtmp_base}/mp4:c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content")
       end
 
       it "should properly create an RTMP audio streaming URL" do
         @d.encoding.audio = 'true'
-        @d.streaming_url(false).should == "#{@rtmp_base}/mp4:c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content"
+        expect(@d.streaming_url(false)).to eq("#{@rtmp_base}/mp4:c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content")
       end
 
       it "should properly create an HTTP video streaming URL" do
         @d.encoding.video = 'true'
-        @d.streaming_url(true).should == "#{@http_base}/c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content.mp4.m3u8"
+        expect(@d.streaming_url(true)).to eq("#{@http_base}/c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content.mp4.m3u8")
       end
 
       it "should properly create an HTTP audio streaming URL" do
         @d.encoding.audio = 'true'
-        @d.streaming_url(true).should == "#{@http_base}/audio-only/c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content.mp4.m3u8"
+        expect(@d.streaming_url(true)).to eq("#{@http_base}/audio-only/c5e0f8b8-3f69-40de-9524-604f03b5f867/8c871d4b-a9a6-4841-8e2a-dd98cf2ee625/content.mp4.m3u8")
       end
     end
   end

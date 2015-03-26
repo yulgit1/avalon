@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20140903161907) do
 
-  create_table "bookmarks", force: true do |t|
+  create_table "bookmarks", force: :cascade do |t|
     t.integer  "user_id",       null: false
     t.string   "document_id"
     t.string   "title"
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 20140903161907) do
 
   add_index "bookmarks", ["user_id"], name: "index_bookmarks_on_user_id"
 
-  create_table "courses", force: true do |t|
+  create_table "courses", force: :cascade do |t|
     t.string   "context_id"
     t.text     "label"
     t.datetime "created_at"
@@ -33,7 +33,7 @@ ActiveRecord::Schema.define(version: 20140903161907) do
     t.string   "title"
   end
 
-  create_table "delayed_jobs", force: true do |t|
+  create_table "delayed_jobs", force: :cascade do |t|
     t.integer  "priority",   default: 0
     t.integer  "attempts",   default: 0
     t.text     "handler"
@@ -49,14 +49,14 @@ ActiveRecord::Schema.define(version: 20140903161907) do
 
   add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority"
 
-  create_table "identities", force: true do |t|
+  create_table "identities", force: :cascade do |t|
     t.string   "email"
     t.string   "password_digest"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "ingest_batches", force: true do |t|
+  create_table "ingest_batches", force: :cascade do |t|
     t.string   "email"
     t.text     "media_object_ids"
     t.boolean  "finished",                    default: false
@@ -66,12 +66,12 @@ ActiveRecord::Schema.define(version: 20140903161907) do
     t.string   "name",             limit: 50
   end
 
-  create_table "role_maps", force: true do |t|
+  create_table "role_maps", force: :cascade do |t|
     t.string  "entry"
     t.integer "parent_id"
   end
 
-  create_table "searches", force: true do |t|
+  create_table "searches", force: :cascade do |t|
     t.text     "query_params"
     t.integer  "user_id"
     t.datetime "created_at"
@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 20140903161907) do
 
   add_index "searches", ["user_id"], name: "index_searches_on_user_id"
 
-  create_table "sessions", force: true do |t|
+  create_table "sessions", force: :cascade do |t|
     t.string   "session_id", null: false
     t.text     "data"
     t.datetime "created_at"
@@ -91,17 +91,17 @@ ActiveRecord::Schema.define(version: 20140903161907) do
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id"
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at"
 
-  create_table "stream_tokens", force: true do |t|
+  create_table "stream_tokens", force: :cascade do |t|
     t.string   "token"
     t.string   "target"
     t.datetime "expires"
   end
 
-  create_table "superusers", force: true do |t|
+  create_table "superusers", force: :cascade do |t|
     t.integer "user_id", null: false
   end
 
-  create_table "users", force: true do |t|
+  create_table "users", force: :cascade do |t|
     t.string   "username",   default: "", null: false
     t.datetime "created_at"
     t.datetime "updated_at"

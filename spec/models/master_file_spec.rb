@@ -19,10 +19,10 @@ describe MasterFile do
 
   describe "validations" do
     subject {MasterFile.new}
-    it {should validate_presence_of(:workflow_name)}
-    it {should validate_inclusion_of(:workflow_name).in_array(MasterFile::WORKFLOWS)}
-    xit {should validate_presence_of(:file_format)}
-    xit {should validate_exclusion_of(:file_format).in_array(['Unknown']).with_message("The file was not recognized as audio or video.")}
+    it {is_expected.to validate_presence_of(:workflow_name)}
+    it {is_expected.to validate_inclusion_of(:workflow_name).in_array(MasterFile::WORKFLOWS)}
+    xit {is_expected.to validate_presence_of(:file_format)}
+    xit {is_expected.to validate_exclusion_of(:file_format).in_array(['Unknown']).with_message("The file was not recognized as audio or video.")}
   end
 
   describe "locations" do
@@ -34,55 +34,55 @@ describe MasterFile do
     }
 
     it "should know where its (local) masterfile is" do
-      subject.file_location.should == '/foo/bar/baz/quux.mp4'
-      subject.absolute_location.should == 'file:///foo/bar/baz/quux.mp4'
+      expect(subject.file_location).to eq('/foo/bar/baz/quux.mp4')
+      expect(subject.absolute_location).to eq('file:///foo/bar/baz/quux.mp4')
     end
 
     it "should know where its (Samba remote) masterfile is" do
-      Avalon::FileResolver.any_instance.stub(:mounts) { 
+      allow_any_instance_of(Avalon::FileResolver).to receive(:mounts) { 
         ["//user@some.server.at.an.example.edu/stuff on /foo/bar (smbfs, nodev, nosuid, mounted by user)"]
       }
 
-      subject.absolute_location.should == 'smb://some.server.at.an.example.edu/stuff/baz/quux.mp4'
+      expect(subject.absolute_location).to eq('smb://some.server.at.an.example.edu/stuff/baz/quux.mp4')
     end
 
     it "should know where its (CIFS remote) masterfile is" do
-      Avalon::FileResolver.any_instance.stub(:mounts) { 
+      allow_any_instance_of(Avalon::FileResolver).to receive(:mounts) { 
         ["//user@some.server.at.an.example.edu/stuff on /foo/bar (cifs, nodev, nosuid, mounted by user)"]
       }
 
-      subject.absolute_location.should == 'cifs://some.server.at.an.example.edu/stuff/baz/quux.mp4'
+      expect(subject.absolute_location).to eq('cifs://some.server.at.an.example.edu/stuff/baz/quux.mp4')
     end
 
     it "should know where its (NFS remote) masterfile is" do
-      Avalon::FileResolver.any_instance.stub(:mounts) { 
+      allow_any_instance_of(Avalon::FileResolver).to receive(:mounts) { 
         ["some.server.at.an.example.edu:/stuff on /foo/bar (nfs, nodev, nosuid, mounted by user)"]
       }
 
-      subject.absolute_location.should == 'nfs://some.server.at.an.example.edu/stuff/baz/quux.mp4'
+      expect(subject.absolute_location).to eq('nfs://some.server.at.an.example.edu/stuff/baz/quux.mp4')
     end
 
     it "should follow the file to a new location" do
-      subject.absolute_location.should == 'file:///foo/bar/baz/quux.mp4'
+      expect(subject.absolute_location).to eq('file:///foo/bar/baz/quux.mp4')
       subject.file_location = "/tmp/baz/quux.mp4"
-      subject.absolute_location.should == 'file:///tmp/baz/quux.mp4'
+      expect(subject.absolute_location).to eq('file:///tmp/baz/quux.mp4')
     end
 
     it "should accept configurable overrides" do
-      Avalon::FileResolver.any_instance.stub(:overrides) {
+      allow_any_instance_of(Avalon::FileResolver).to receive(:overrides) {
         { '/foo/bar/' => 'http://repository.example.edu/foothings/' }
       }
-      subject.absolute_location.should == 'http://repository.example.edu/foothings/baz/quux.mp4'
+      expect(subject.absolute_location).to eq('http://repository.example.edu/foothings/baz/quux.mp4')
     end
 
     it "should accept an empty file location" do
       subject.file_location = ""
-      subject.absolute_location.should be_empty
+      expect(subject.absolute_location).to be_empty
     end
 
     it "should accept a nil file location" do
       subject.file_location = nil
-      subject.absolute_location.should be_nil
+      expect(subject.absolute_location).to be_nil
     end
   end
 
@@ -93,12 +93,12 @@ describe MasterFile do
       mf.save
       derivative.save
 
-      mf.derivatives.should be_empty
+      expect(mf.derivatives).to be_empty
       mf.derivatives += [derivative]
       derivative.save
       mf.reload
 
-      derivative.masterfile_id.should eq mf.id
+      expect(derivative.masterfile_id).to eq mf.id
 
       #derivative.relationships_are_dirty.should be true
     end
@@ -109,15 +109,15 @@ describe MasterFile do
       let(:master_file){ MasterFile.new }
       it 'returns true for stopped' do
         master_file.status_code = 'STOPPED'
-        master_file.finished_processing?.should be true
+        expect(master_file.finished_processing?).to be true
       end
       it 'returns true for succeeded' do
         master_file.status_code = 'SUCCEEDED'
-        master_file.finished_processing?.should be true
+        expect(master_file.finished_processing?).to be true
       end
       it 'returns true for failed' do
         master_file.status_code = 'FAILED'
-        master_file.finished_processing?.should be true
+        expect(master_file.finished_processing?).to be true
       end
     end
   end
@@ -188,21 +188,21 @@ describe MasterFile do
       it "should accept a value" do
         offset = master_file.duration.to_i / 2
         master_file.poster_offset = offset
-        master_file.poster_offset.should == offset.to_s
-        master_file.should be_valid
+        expect(master_file.poster_offset).to eq(offset.to_s)
+        expect(master_file).to be_valid
       end
 
       it "should complain if value < 0" do
         master_file.poster_offset = -1
-        master_file.should_not be_valid
-        master_file.errors[:poster_offset].first.should == "must be between 0 and #{master_file.duration}"
+        expect(master_file).not_to be_valid
+        expect(master_file.errors[:poster_offset].first).to eq("must be between 0 and #{master_file.duration}")
       end
 
       it "should complain if value > duration" do
         offset = master_file.duration.to_i + rand(32514) + 500
         master_file.poster_offset = offset
-        master_file.should_not be_valid
-        master_file.errors[:poster_offset].first.should == "must be between 0 and #{master_file.duration}"
+        expect(master_file).not_to be_valid
+        expect(master_file.errors[:poster_offset].first).to eq("must be between 0 and #{master_file.duration}")
       end
     end
 
@@ -210,21 +210,21 @@ describe MasterFile do
       it "should accept a value" do
         offset = master_file.duration.to_i / 2
         master_file.poster_offset = offset.to_hms
-        master_file.poster_offset.should == offset.to_s
-        master_file.should be_valid
+        expect(master_file.poster_offset).to eq(offset.to_s)
+        expect(master_file).to be_valid
       end
 
       it "should complain if value > duration" do
         offset = master_file.duration.to_i + rand(32514) + 500
         master_file.poster_offset = offset.to_hms
-        master_file.should_not be_valid
-        master_file.errors[:poster_offset].first.should == "must be between 0 and #{master_file.duration}"
+        expect(master_file).not_to be_valid
+        expect(master_file.errors[:poster_offset].first).to eq("must be between 0 and #{master_file.duration}")
       end
     end
 
     describe "update images" do
       it "should update on save" do
-        MasterFile.should_receive(:extract_still).with(master_file.pid,{type:'both',offset:'12345'})
+        expect(MasterFile).to receive(:extract_still).with(master_file.pid,{type:'both',offset:'12345'})
         master_file.poster_offset = 12345
         master_file.save
       end
@@ -239,12 +239,12 @@ describe MasterFile do
         it "should not use the skipped transcoding workflow" do
           master_file.file_format = 'Moving image'
           master_file.set_workflow
-          master_file.workflow_name.should == 'avalon'
+          expect(master_file.workflow_name).to eq('avalon')
         end 
         it "should use the skipped transcoding workflow for video" do
           master_file.file_format = 'Moving image'
           master_file.set_workflow('skip_transcoding')
-          master_file.workflow_name.should == 'avalon-skip-transcoding'
+          expect(master_file.workflow_name).to eq('avalon-skip-transcoding')
         end
       end
 
@@ -252,12 +252,12 @@ describe MasterFile do
         it "should not use the skipped transcoding workflow" do
           master_file.file_format = 'Sound'
           master_file.set_workflow
-          master_file.workflow_name.should == 'fullaudio'
+          expect(master_file.workflow_name).to eq('fullaudio')
         end 
         it "should use the skipped transcoding workflow for video" do
           master_file.file_format = 'Sound'
           master_file.set_workflow('skip_transcoding')
-          master_file.workflow_name.should == 'avalon-skip-transcoding-audio'
+          expect(master_file.workflow_name).to eq('avalon-skip-transcoding-audio')
         end
       end
     end
@@ -265,21 +265,21 @@ describe MasterFile do
       it "should use the avalon workflow" do
         master_file.file_format = 'Moving image'
         master_file.set_workflow
-        master_file.workflow_name.should == 'avalon'
+        expect(master_file.workflow_name).to eq('avalon')
       end 
     end
     describe "audio" do
       it "should use the fullaudio workflow" do
         master_file.file_format = 'Sound'
         master_file.set_workflow
-        master_file.workflow_name.should == 'fullaudio'
+        expect(master_file.workflow_name).to eq('fullaudio')
       end
     end
     describe "unknown format" do
       it "should set workflow_name to nil" do
         master_file.file_format = 'Unknown'
         master_file.set_workflow
-        master_file.workflow_name.should == nil
+        expect(master_file.workflow_name).to eq(nil)
       end
     end
   end
@@ -295,16 +295,16 @@ describe MasterFile do
         it "it should set the correct file location and size" do
           masterfile = FactoryGirl.create(:master_file)
           masterfile.setContent(derivative_hash)
-          masterfile.file_location.should == filename_high
-          masterfile.file_size.should == "199160"
+          expect(masterfile.file_location).to eq(filename_high)
+          expect(masterfile.file_size).to eq("199160")
         end
       end
       describe "quality-high does not exist" do
         it "should set the correct file location and size" do
           masterfile = FactoryGirl.create(:master_file)
           masterfile.setContent(derivative_hash.except("quality-high"))
-          masterfile.file_location.should == filename_medium
-          masterfile.file_size.should == "199160"
+          expect(masterfile.file_location).to eq(filename_medium)
+          expect(masterfile.file_size).to eq("199160")
         end
       end
 
@@ -338,12 +338,12 @@ describe MasterFile do
         
         it "should rename an uploaded file in place" do
           Avalon::Configuration['matterhorn'].delete('media_path')
-          subject.file_location.should == File.join(tempdir,original)
+          expect(subject.file_location).to eq(File.join(tempdir,original))
         end
         
         it "should copy an uploaded file to the Matterhorn media path" do
           Avalon::Configuration['matterhorn']['media_path'] = media_path
-          subject.file_location.should == File.join(media_path,original)
+          expect(subject.file_location).to eq(File.join(media_path,original))
         end
       end
     end

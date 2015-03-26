@@ -121,7 +121,7 @@
     gem 'daemons'
     gem 'capistrano', '~>2.12.0'
     gem 'rvm-capistrano'
-    gem 'rspec-rails', '~>2.9'
+    gem 'rspec-rails', '~>3.0'
     gem 'puma'
     gem 'rb-fsevent', '~> 0.9.1'
     gem 'letter_opener'

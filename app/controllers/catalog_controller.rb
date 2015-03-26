@@ -178,4 +178,9 @@ class CatalogController < ApplicationController
     session[:sort] = params[:sort] if params[:sort].present?
     session[:per_page] = params[:per_page] if params[:per_page].present?
   end
+
+  def apply_sticky_settings(solr_parameters, user_parameters)
+    solr_parameters[:rows] = session[:per_page] if session[:per_page].present?
+    solr_parameters[:sort] = session[:sort] if session[:sort].present?
+  end
 end 

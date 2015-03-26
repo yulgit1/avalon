@@ -17,7 +17,6 @@ class MediaObject < ActiveFedora::Base
   include Hydra::AccessControls::Permissions
   include Avalon::AccessControls::Hidden
   include Avalon::AccessControls::VirtualGroups
-  include Hydra::ModelMethods
   include ActiveFedora::Associations
   include Avalon::Workflow::WorkflowModelMixin
 #  include VersionableModel

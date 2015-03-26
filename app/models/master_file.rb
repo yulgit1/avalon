@@ -20,7 +20,6 @@ require 'avalon/m3u8_reader'
 
 class MasterFile < ActiveFedora::Base
   include ActiveFedora::Associations
-  include Hydra::ModelMethods
   include Hydra::AccessControls::Permissions
   include Hooks
   include Rails.application.routes.url_helpers

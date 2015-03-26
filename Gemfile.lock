@@ -25,7 +25,7 @@ GIT
 
 GIT
   remote: https://github.com/avalonmediasystem/avalon-workflow.git
-  revision: 055ba5114d3d6ccc2a3d980af32f942822a9b359
+  revision: 1570a19f499b59bff17b2498d7a56ce8a82205b5
   branch: feature/hydra9
   specs:
     avalon-workflow (0.0.3)

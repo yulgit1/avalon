@@ -31,7 +31,7 @@ class CommentsController < ApplicationController
 
     if (@comment.valid?)
       begin
-	CommentsMailer.contact_email(@comment).deliver
+	CommentsMailer.contact_email(@comment).deliver_now
       rescue Errno::ECONNRESET => e
 	logger.warn "The mail server does not appear to be responding \n #{e}"
 	

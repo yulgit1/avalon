@@ -160,7 +160,7 @@ class MasterFilesController < ApplicationController
       # ready to be previewed
       ingest_batch = IngestBatch.find_ingest_batch_by_media_object_id( master_file.mediaobject.id )
       if ingest_batch && ! ingest_batch.email_sent? && ingest_batch.finished?
-        IngestBatchMailer.status_email(ingest_batch.id).deliver
+        IngestBatchMailer.status_email(ingest_batch.id).deliver_now
         ingest_batch.email_sent = true
         ingest_batch.save!
       end

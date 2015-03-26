@@ -29,6 +29,7 @@ class MediaObject < ActiveFedora::Base
   belongs_to :governing_policy, :class_name=>'Admin::Collection', :predicate=>ActiveFedora::RDF::ProjectHydra.isGovernedBy
   belongs_to :collection, :class_name=>'Admin::Collection', :predicate=>ActiveFedora::RDF::Fcrepo::RelsExt.isMemberOfCollection
 
+  contains "DC", class_name: 'DublinCoreDocument'
   contains "descMetadata", class_name: 'ModsDocument'
 
   after_create :after_create

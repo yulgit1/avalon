@@ -63,8 +63,8 @@ class MasterFile < ActiveFedora::Base
   has_attributes :label, :file_checksum, :file_size, :duration, :display_aspect_ratio, :original_frame_size, :file_format, :poster_offset, :thumbnail_offset, datastream: :descMetadata, multiple: false
   has_attributes :workflow_id, :workflow_name, :mediapackage_id, :percent_complete, :percent_succeeded, :percent_failed, :status_code, :operation, :error, :failures, datastream: :mhMetadata, multiple: false
 
-  has_file_datastream name: 'thumbnail'
-  has_file_datastream name: 'poster'
+  contains 'thumbnail'
+  contains 'poster'
 
 
   validates :workflow_name, presence: true, inclusion: { in: Proc.new{ WORKFLOWS } }

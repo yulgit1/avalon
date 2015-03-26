@@ -12,7 +12,7 @@
 #   specific language governing permissions and limitations under the License.
 # ---  END LICENSE_HEADER BLOCK  ---
 
-class UrlDatastream < ActiveFedora::Datastream
+class UrlDatastream < ActiveFedora::File
   def location
     self.content
   end

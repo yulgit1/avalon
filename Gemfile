@@ -99,6 +99,7 @@
     # For overriding the default interface with Twitter Bootstrap
     # This is now inherited from Blacklight
     gem 'sass-rails', '=4.0.3'
+    gem 'bootstrap-sass', '~> 3.3.4.1'
     gem 'font-awesome-rails', '~> 3.0'
     gem 'bootstrap_form'
     gem 'handlebars_assets'

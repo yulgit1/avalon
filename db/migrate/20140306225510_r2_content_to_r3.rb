@@ -18,7 +18,7 @@ class R2ContentToR3 < ActiveRecord::Migration
   def up
     say_with_time("R2->R3") do
       prefix = Avalon::Configuration.lookup('fedora.namespace')
-      ActiveFedora::Base.reindex_everything("pid~#{prefix}:*")
+#      ActiveFedora::Base.reindex_everything("pid~#{prefix}:*")
       MasterFile.find_each({'has_model_version_ssim' => 'R2'},{batch_size:5}) { |obj| masterfile_to_r3(obj) }
       MediaObject.find_each({'has_model_version_ssim' => 'R2'},{batch_size:5}) { |obj| mediaobject_to_r3(obj) }
       Admin::Collection.find_each({'has_model_version_ssim' => 'R2'},{batch_size:5}) { |obj| collection_to_r3(obj) }

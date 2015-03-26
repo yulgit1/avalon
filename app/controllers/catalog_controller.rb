@@ -23,7 +23,7 @@ class CatalogController < ApplicationController
   CatalogController.search_params_logic += [:add_access_controls_to_solr_params_if_not_admin, :only_wanted_models, :only_published_items, :limit_to_non_hidden_items, :apply_sticky_settings]
  
   configure_blacklight do |config|
-    config.search_builder_class = AvalonSearchBuilder
+    config.search_builder_class = SearchBuilder
     config.http_method = :post
     config.default_solr_params = { 
       :qt => 'search',

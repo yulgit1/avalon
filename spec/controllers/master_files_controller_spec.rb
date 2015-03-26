@@ -150,7 +150,7 @@ describe MasterFilesController do
         allow(IngestBatch).to receive(:all) {[IngestBatch.new(media_object_ids: [master_file.mediaobject.id], name: "Batch #1", email: "test@test.com" )]}
         mailer = double('mailer').as_null_object
         IngestBatchMailer.should_receive(:status_email).and_return(mailer)
-        mailer.should_receive(:deliver)
+        mailer.should_receive(:deliver_now)
         put :update, id: master_file.pid, workflow_id: 1103
       end
       it "should handle stopped workflows" do
@@ -158,7 +158,7 @@ describe MasterFilesController do
         allow(IngestBatch).to receive(:all) {[IngestBatch.new(media_object_ids: [master_file.mediaobject.id], name: "Batch #1", email: "test@test.com" )]}
         mailer = double('mailer').as_null_object
         IngestBatchMailer.should_receive(:status_email).and_return(mailer)
-        mailer.should_receive(:deliver)
+        mailer.should_receive(:deliver_now)
         put :update, id: master_file.pid, workflow_id: 1103
       end
     end

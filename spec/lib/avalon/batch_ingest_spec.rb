@@ -70,7 +70,7 @@ describe Avalon::Batch::Ingest do
     it 'should send email when batch finishes processing' do
       mailer = double('mailer').as_null_object
       IngestBatchMailer.should_receive(:batch_ingest_validation_success).with(duck_type(:each)).and_return(mailer)
-      mailer.should_receive(:deliver)
+      mailer.should_receive(:deliver_now)
       batch_ingest.ingest
     end
     
@@ -193,7 +193,7 @@ describe Avalon::Batch::Ingest do
       Avalon::Dropbox.any_instance.stub(:find_new_packages).and_return [batch]
       mailer = double('mailer').as_null_object
       IngestBatchMailer.should_receive(:batch_ingest_validation_error).with(duck_type(:each),duck_type(:each)).and_return(mailer)
-      mailer.should_receive(:deliver)
+      mailer.should_receive(:deliver_now)
       expect{batch_ingest.ingest}.to_not change{IngestBatch.count}
       batch.errors[3].messages.should have_key(:content)
       batch.errors[3].messages[:content].should eq(["File not found: spec/fixtures/dropbox/example_batch_ingest/assets/sheephead_mountain_wrong.mov"])
@@ -210,7 +210,7 @@ describe Avalon::Batch::Ingest do
       Avalon::Dropbox.any_instance.stub(:find_new_packages).and_return [batch]
       mailer = double('mailer').as_null_object
       IngestBatchMailer.should_receive(:batch_ingest_validation_error).with(anything(), include("User jay@krajcik.org does not have permission to add items to collection: Ut minus ut accusantium odio autem odit..")).and_return(mailer)
-      mailer.should_receive(:deliver)
+      mailer.should_receive(:deliver_now)
       expect{batch_ingest.ingest}.to_not change{IngestBatch.count}
     end
 
@@ -219,7 +219,7 @@ describe Avalon::Batch::Ingest do
       Avalon::Dropbox.any_instance.stub(:find_new_packages).and_return [batch]
       mailer = double('mailer').as_null_object
       IngestBatchMailer.should_receive(:batch_ingest_validation_error).with(duck_type(:each),duck_type(:each)).and_return(mailer)
-      mailer.should_receive(:deliver)
+      mailer.should_receive(:deliver_now)
       expect{batch_ingest.ingest}.to_not change{IngestBatch.count}
       batch.errors[4].messages.should have_key(:offset)
       batch.errors[4].messages[:offset].should eq(['Invalid offset: 5:000'])
@@ -230,7 +230,7 @@ describe Avalon::Batch::Ingest do
       Avalon::Dropbox.any_instance.stub(:find_new_packages).and_return [batch]
       mailer = double('mailer').as_null_object
       IngestBatchMailer.should_receive(:batch_ingest_validation_error).with(duck_type(:each),duck_type(:each)).and_return(mailer)
-      mailer.should_receive(:deliver)
+      mailer.should_receive(:deliver_now)
       expect{batch_ingest.ingest}.to_not change{IngestBatch.count}
       batch.errors[4].messages.should have_key(:creator)
       batch.errors[4].messages[:creator].should eq(['field is required.'])
@@ -241,7 +241,7 @@ describe Avalon::Batch::Ingest do
       Avalon::Dropbox.any_instance.stub(:find_new_packages).and_return [batch]
       mailer = double('mailer').as_null_object
       IngestBatchMailer.should_receive(:batch_ingest_validation_error).with(duck_type(:each),duck_type(:each)).and_return(mailer)
-      mailer.should_receive(:deliver)
+      mailer.should_receive(:deliver_now)
       expect{batch_ingest.ingest}.to_not change{IngestBatch.count}
       batch.errors[4].messages.should have_key(:contributator)
       batch.errors[4].messages[:contributator].should eq(["Metadata attribute 'contributator' not found"])
@@ -252,7 +252,7 @@ describe Avalon::Batch::Ingest do
       Avalon::Dropbox.any_instance.stub(:find_new_packages).and_return [batch]
       mailer = double('mailer').as_null_object
       IngestBatchMailer.should_receive(:batch_ingest_validation_error).with(batch ,['RuntimeError: Foo']).and_return(mailer)
-      mailer.should_receive(:deliver)
+      mailer.should_receive(:deliver_now)
       batch_ingest.should_receive(:ingest_package) { raise "Foo" }
       expect { batch_ingest.ingest }.to_not raise_error
     end

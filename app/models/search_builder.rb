@@ -1,4 +1,4 @@
-class AvalonSearchBuilder < Hydra::SearchBuilder
+class SearchBuilder < Hydra::SearchBuilder
   include Hydra::PolicyAwareAccessControlsEnforcement
 
   def only_wanted_models(solr_parameters)

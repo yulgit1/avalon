@@ -25,4 +25,9 @@ class SearchBuilder < Hydra::SearchBuilder
       add_access_controls_to_solr_params(solr_parameters)
     end
   end 
+
+  def apply_sticky_settings(solr_parameters)
+    solr_parameters[:rows] = session[:per_page] if session[:per_page].present?
+    solr_parameters[:sort] = session[:sort] if session[:sort].present?
+  end 
 end

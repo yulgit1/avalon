@@ -19,7 +19,7 @@ SimpleCov.start 'rails'
 
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
-require 'rspec/autorun'
+#require 'rspec/autorun'
 require 'equivalent-xml/rspec_matchers'
 require 'capybara/rspec'
 require 'database_cleaner'

@@ -13,9 +13,13 @@ before_install:
 before_script:
   - bundle exec rake jetty:unzip jetty:config felix:config avalon:services:start
   - bundle exec rake db:migrate
+script: "bundle exec rake $TEST_SUITE"
 notifications:
   irc: "chat.freenode.net#projectvov"
 language: ruby
 rvm:
   - 2.0.0
   - 2.1.5
+env:
+  - TEST_SUITE="spec:controllers spec:helpers spec:integration spec:mailers spec:routing"
+  - TEST_SUITE="spec:lib spec:models spec:validators"

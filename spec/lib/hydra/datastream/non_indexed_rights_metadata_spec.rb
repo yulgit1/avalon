@@ -16,7 +16,7 @@ require 'spec_helper'
 describe Hydra::Datastream::InheritableRightsMetadata do
   it "should not index anything" do
     obj = ActiveFedora::Base.new
-    datastream = Hydra::Datastream::NonIndexedRightsMetadata.new(obj.inner_object, nil)
+    datastream = Hydra::Datastream::NonIndexedRightsMetadata.new(obj)
     expect(datastream.to_solr).to eq({})
   end
 end

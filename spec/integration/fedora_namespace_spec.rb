@@ -16,10 +16,8 @@ require 'spec_helper'
 
 describe 'ID Assignment' do
   let(:namespace) { Avalon::Configuration.lookup('fedora.namespace') }
-  let(:id)       { "12345" }
-  subject(:object) { ActiveFedora::Base.create(id) }
+  subject(:object) { ActiveFedora::Base.create! }
   it "should assign an id in the correct namespace" do
-    expect(object.id).to eq(id)
-    expect(object.uri).to eq("#{ActiveFedora.fedora.host}/test/#{namespace}/#{id}")
+    expect(object.uri).to start_with("#{ActiveFedora.fedora.host}/test/#{namespace}/")
   end
 end

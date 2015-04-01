@@ -64,6 +64,8 @@ RSpec.configure do |config|
 #    DatabaseCleaner[:active_fedora].strategy = :deletion
     DatabaseCleaner.clean
     ActiveFedora::Base.destroy_all
+    #Sometimes it takes two calls to really destroy everything
+    ActiveFedora::Base.destroy_all
     Rails.cache.clear 
     Deprecation.default_deprecation_behavior = :silence
 
@@ -101,6 +103,8 @@ RSpec.configure do |config|
     Derivative.destroy_all
     MasterFile.destroy_all
     MediaObject.destroy_all
+    ActiveFedora::Base.destroy_all
+    #Sometimes it takes two calls to really destroy everything
     ActiveFedora::Base.destroy_all
    end 
 

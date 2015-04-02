@@ -244,7 +244,7 @@ describe Avalon::Batch::Ingest do
       expect(mailer).to receive(:deliver_now)
       expect{batch_ingest.ingest}.to_not change{IngestBatch.count}
       expect(batch.errors[4].messages).to have_key(:contributator)
-      expect(batch.errors[4].messages[:contributator]).to eq(["MediaObject does not have an attribute `contributator'"])
+      expect(batch.errors[4].messages[:contributator]).to eq(["Metadata attribute 'contributator' not found"])
     end
     
     it 'should fail if an unknown error occurs' do

@@ -272,11 +272,7 @@ class MediaObject < ActiveFedora::Base
           end
           update_attribute_in_metadata(k, vals, attrs)
         else
-          if self.class.multiple?(k)
-            update_attribute_in_metadata(k, Array(v))
-          else
-            update_attribute_in_metadata(k, v)
-          end
+          update_attribute_in_metadata(k, v)
         end
       rescue Exception => msg
         missing_attributes[k.to_sym] = msg.to_s

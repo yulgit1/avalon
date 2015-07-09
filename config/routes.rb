@@ -22,6 +22,7 @@ Avalon::Application.routes.draw do
 
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }, format: false
   devise_scope :user do 
+    match "/courselink(/:target_id)", to: 'users/omniauth_callbacks#lti', as: :course_link, via: [:get, :post]
     match '/users/sign_in', :to => "users/sessions#new", :as => :new_user_session, via: [:get]
     match '/users/sign_out', :to => "users/sessions#destroy", :as => :destroy_user_session, via: [:get]
   end
@@ -153,4 +154,12 @@ Avalon::Application.routes.draw do
   # This is a legacy wild controller route that's not recommended for RESTful applications.
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id(.:format)))'
+end
+
+require 'avalon/active_fedora_base_path_helper'
+Avalon::Application.routes.url_helpers.module_eval do
+  include Avalon::ActiveFedoraBasePathHelper
+  class << self
+    include Avalon::ActiveFedoraBasePathHelper
+  end
 end

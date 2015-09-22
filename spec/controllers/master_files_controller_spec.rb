@@ -19,7 +19,16 @@ describe MasterFilesController do
     let!(:media_object) {FactoryGirl.create(:media_object)}
     let!(:content_provider) {login_user media_object.collection.managers.first}
 
+    before do
+      if mediainfo_output
+        mediainfo = Mediainfo.new
+        mediainfo.raw_response = File.read(mediainfo_output)
+        allow_any_instance_of(MasterFile).to receive(:mediainfo).and_return mediainfo
+      end
+    end
+
     context "must provide a container id" do
+      let(:mediainfo_output) { "spec/fixtures/videoshort.mp4.xml" }
       it "should fail if no container id provided" do
         request.env["HTTP_REFERER"] = "/"
         @file = fixture_file_upload('/videoshort.mp4', 'video/mp4')
@@ -29,6 +38,8 @@ describe MasterFilesController do
     end
      
     context "cannot upload a file over the defined limit" do
+     let(:mediainfo_output) { "spec/fixtures/videoshort.mp4.xml" }
+
      it "should provide a warning about the file size" do
       request.env["HTTP_REFERER"] = "/"
             
@@ -42,55 +53,61 @@ describe MasterFilesController do
     end
      
     context "must be a valid MIME type" do
-      it "should recognize a video format" do
-        @file = fixture_file_upload('/videoshort.mp4', 'video/mp4')
-        post :create, 
-          Filedata: [@file], 
-          original: 'any', 
-          container_id: media_object.pid 
+      context "video" do
+        let(:mediainfo_output) { "spec/fixtures/videoshort.mp4.xml" }
+        it "should recognize a video format" do
+          @file = fixture_file_upload('/videoshort.mp4', 'video/mp4')
+          post :create, 
+            Filedata: [@file], 
+            original: 'any', 
+            container_id: media_object.pid 
 
-        master_file = media_object.reload.parts.first
-        master_file.file_format.should eq "Moving image" 
+          master_file = media_object.reload.parts.first
+          master_file.file_format.should eq "Moving image" 
              
-        flash[:errors].should be_nil
+          flash[:errors].should be_nil
+        end
+        it "should recognize audio/video based on extension when MIMETYPE is of unknown format" do
+          @file = fixture_file_upload('/videoshort.mp4', 'application/octet-stream')
+    
+          post :create, 
+            Filedata: [@file], 
+            original: 'any', 
+            container_id: media_object.pid 
+          master_file = MasterFile.all.last
+          master_file.file_format.should eq "Moving image" 
+             
+          flash[:errors].should be_nil
+        end
       end
-           
-     it "should recognize an audio format" do
-       @file = fixture_file_upload('/jazz-performance.mp3', 'audio/mp3')
-       post :create, 
-         Filedata: [@file], 
-         original: 'any', 
-         container_id: media_object.pid 
+      context "audio" do      
+        let(:mediainfo_output) { "spec/fixtures/jazz-performance.mp3.xml" }
+        it "should recognize an audio format" do
+          @file = fixture_file_upload('/jazz-performance.mp3', 'audio/mp3')
+          post :create, 
+            Filedata: [@file], 
+            original: 'any', 
+            container_id: media_object.pid 
 
-       master_file = media_object.reload.parts.first
-       master_file.file_format.should eq "Sound" 
-     end
-       
-     it "should reject non audio/video format" do
-       request.env["HTTP_REFERER"] = "/"
-     
-       @file = fixture_file_upload('/public-domain-book.txt', 'application/json')
+          master_file = media_object.reload.parts.first
+          master_file.file_format.should eq "Sound" 
+        end
+      end
+      context "not audio/video" do  
+        let(:mediainfo_output) { nil }
+        it "should reject non audio/video format" do
+          request.env["HTTP_REFERER"] = "/"
+          @file = fixture_file_upload('/public-domain-book.txt', 'application/json')
 
-       expect { post :create, Filedata: [@file], original: 'any', container_id: media_object.pid }.not_to change { MasterFile.count }
+          expect { post :create, Filedata: [@file], original: 'any', container_id: media_object.pid }.not_to change { MasterFile.count }
      
-       flash[:error].should_not be_nil
-     end
-    
-     it "should recognize audio/video based on extension when MIMETYPE is of unknown format" do
-       @file = fixture_file_upload('/videoshort.mp4', 'application/octet-stream')
-    
-       post :create, 
-         Filedata: [@file], 
-         original: 'any', 
-         container_id: media_object.pid 
-       master_file = MasterFile.all.last
-       master_file.file_format.should eq "Moving image" 
-             
-       flash[:errors].should be_nil
-     end
-    end
+          flash[:error].should_not be_nil
+        end
+      end
+   end
      
     context "should process file successfully" do
+      let(:mediainfo_output) { "spec/fixtures/videoshort.mp4.xml" }
       it "should associate with a MediaObject" do
         @file = fixture_file_upload('/videoshort.mp4', 'video/mp4')
         #Work-around for a Rails bug

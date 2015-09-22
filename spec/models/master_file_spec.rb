@@ -274,6 +274,12 @@ describe MasterFile do
   end
 
   describe '#setContent' do
+    before do
+      mediainfo = Mediainfo.new
+      mediainfo.raw_response = File.read("spec/fixtures/videoshort.mp4.xml")
+      allow_any_instance_of(MasterFile).to receive(:mediainfo).and_return mediainfo
+    end
+
     describe "multiple files for pre-transcoded derivatives" do
       let(:filename_high)    { File.expand_path('../../fixtures/videoshort.high.mp4',__FILE__) }
       let(:filename_medium)    { File.expand_path('../../fixtures/videoshort.medium.mp4',__FILE__) }

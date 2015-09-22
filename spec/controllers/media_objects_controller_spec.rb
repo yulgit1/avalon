@@ -63,7 +63,7 @@ describe MediaObjectsController, type: :controller do
   describe "#edit" do
     let!(:media_object) { FactoryGirl.create(:media_object) }
     before do
-      allow(media_object.collection.dropbox).to recieve(:all) { [] }
+      allow(media_object.collection.dropbox).to receive(:all) { [] }
     end
 
     it "should redirect to sign in page with a notice when unauthenticated" do   

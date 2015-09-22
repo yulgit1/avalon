@@ -99,6 +99,7 @@ RSpec.configure do |config|
     DatabaseCleaner.start
     RoleMap.reset!
     Admin::Collection.stub(:units).and_return ['University Archives', 'University Library']
+    allow(Mediainfo).to receive(:version).and_return { "0.7.35" }
   end
 
   config.after(:each) do

@@ -62,8 +62,10 @@ describe MediaObjectsController, type: :controller do
 
   describe "#edit" do
     let!(:media_object) { FactoryGirl.create(:media_object) }
+
+    #Quick fix to avoid using lsof
     before do
-      allow(media_object.collection.dropbox).to receive(:all) { [] }
+      allow(Avalon::Batch).to receive(:find_open_files) { [] }
     end
 
     it "should redirect to sign in page with a notice when unauthenticated" do   

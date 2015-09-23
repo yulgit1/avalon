@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="0.7.35">
+<File>
+<track type="General">
+<Complete_name>jazz-performance.mp3</Complete_name>
+<Format>MPEG Audio</Format>
+<File_size>2.49 MiB</File_size>
+<Duration>3mn 7s</Duration>
+<Overall_bit_rate>111 Kbps</Overall_bit_rate>
+<Writing_library>LAME3.98r</Writing_library>
+<Encoding_settings>LAME 64bits version 3.98.4 (http://www.mp3dev.org/)</Encoding_settings>
+<Comment>http://www.archive.org/details/ChickWebbOrchestra-SpinninTheWebb</Comment>
+</track>
+
+<track type="Audio">
+<Format>MPEG Audio</Format>
+<Format_version>Version 1</Format_version>
+<Format_profile>Layer 3</Format_profile>
+<Mode>Joint stereo</Mode>
+<Mode_extension>MS Stereo</Mode_extension>
+<Duration>3mn 7s</Duration>
+<Bit_rate_mode>Variable</Bit_rate_mode>
+<Bit_rate>111 Kbps</Bit_rate>
+<Minimum_bit_rate>32.0 Kbps</Minimum_bit_rate>
+<Channel_s_>2 channels</Channel_s_>
+<Sampling_rate>44.1 KHz</Sampling_rate>
+<Stream_size>2.49 MiB (100%)</Stream_size>
+<Writing_library>LAME3.98r</Writing_library>
+<Encoding_settings>-m j -V 2 -q 3 -lowpass 18.6 --vbr-old -b 32</Encoding_settings>
+</track>
+
+</File>
+</Mediainfo>
+

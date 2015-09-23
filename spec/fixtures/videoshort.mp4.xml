@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mediainfo version="0.7.35">
+<File>
+<track type="General">
+<Complete_name>videoshort.mp4</Complete_name>
+<Format>MPEG-4</Format>
+<Format_profile>Base Media / Version 2</Format_profile>
+<Codec_ID>mp42</Codec_ID>
+<File_size>194 KiB</File_size>
+<Duration>6s 314ms</Duration>
+<Overall_bit_rate>252 Kbps</Overall_bit_rate>
+<Encoded_date>UTC 2010-09-23 00:37:25</Encoded_date>
+<Tagged_date>UTC 2010-09-23 00:37:27</Tagged_date>
+<Writing_application>HandBrake 0.9.4 2009112300</Writing_application>
+</track>
+
+<track type="Video">
+<ID>1</ID>
+<Format>AVC</Format>
+<Format_Info>Advanced Video Codec</Format_Info>
+<Format_profile>Main@L1.1</Format_profile>
+<Format_settings__CABAC>Yes</Format_settings__CABAC>
+<Format_settings__ReFrames>2 frames</Format_settings__ReFrames>
+<Codec_ID>avc1</Codec_ID>
+<Codec_ID_Info>Advanced Video Coding</Codec_ID_Info>
+<Duration>6s 282ms</Duration>
+<Bit_rate_mode>Variable</Bit_rate_mode>
+<Bit_rate>74.5 Kbps</Bit_rate>
+<Width>200 pixels</Width>
+<Height>110 pixels</Height>
+<Display_aspect_ratio>16:9</Display_aspect_ratio>
+<Frame_rate_mode>Variable</Frame_rate_mode>
+<Frame_rate>23.719 fps</Frame_rate>
+<Original_frame_rate>24.000 fps</Original_frame_rate>
+<Minimum_frame_rate>12.500 fps</Minimum_frame_rate>
+<Maximum_frame_rate>24.390 fps</Maximum_frame_rate>
+<Color_space>YUV</Color_space>
+<Chroma_subsampling>4:2:0</Chroma_subsampling>
+<Bit_depth>8 bits</Bit_depth>
+<Scan_type>Progressive</Scan_type>
+<Bits__Pixel_Frame_>0.143</Bits__Pixel_Frame_>
+<Stream_size>57.1 KiB (29%)</Stream_size>
+<Writing_library>x264 core 79 r1347 5ddd61b</Writing_library>
+<Encoding_settings>cabac=1 / ref=2 / deblock=1:0:0 / analyse=0x1:0x111 / me=hex / subme=6 / psy=1 / psy_rd=1.0:0.0 / mixed_ref=0 / me_range=16 / chroma_me=1 / trellis=0 / 8x8dct=0 / cqm=0 / deadzone=21,11 / chroma_qp_offset=-2 / threads=3 / nr=0 / decimate=1 / mbaff=0 / constrained_intra=0 / bframes=2 / b_pyramid=0 / b_adapt=1 / b_bias=0 / direct=1 / wpredb=0 / wpredp=2 / keyint=240 / keyint_min=24 / scenecut=40 / rc_lookahead=40 / rc=crf / mbtree=1 / crf=25.5 / qcomp=0.60 / qpmin=10 / qpmax=51 / qpstep=4 / ip_ratio=1.40 / aq=1:1.00</Encoding_settings>
+<Encoded_date>UTC 2010-09-23 00:37:25</Encoded_date>
+<Tagged_date>UTC 2010-09-23 00:37:27</Tagged_date>
+<Color_primaries>BT.601-6 525, BT.1358 525, BT.1700 NTSC, SMPTE 170M</Color_primaries>
+<Transfer_characteristics>BT.709-5, BT.1361</Transfer_characteristics>
+<Matrix_coefficients>BT.601-6 525, BT.1358 525, BT.1700 NTSC, SMPTE 170M</Matrix_coefficients>
+</track>
+
+<track type="Audio">
+<ID>2</ID>
+<Format>AAC</Format>
+<Format_Info>Advanced Audio Codec</Format_Info>
+<Format_version>Version 4</Format_version>
+<Format_profile>LC</Format_profile>
+<Format_settings__SBR>No</Format_settings__SBR>
+<Format_settings__PS>Yes</Format_settings__PS>
+<Codec_ID>40</Codec_ID>
+<Duration>6s 314ms</Duration>
+<Bit_rate_mode>Variable</Bit_rate_mode>
+<Bit_rate>171 Kbps</Bit_rate>
+<Maximum_bit_rate>202 Kbps</Maximum_bit_rate>
+<Channel_s_>2 channels</Channel_s_>
+<Channel_positions>Front: L R</Channel_positions>
+<Sampling_rate>48.0 KHz</Sampling_rate>
+<Stream_size>132 KiB (68%)</Stream_size>
+<Encoded_date>UTC 2010-09-23 00:37:25</Encoded_date>
+<Tagged_date>UTC 2010-09-23 00:37:27</Tagged_date>
+</track>
+
+</File>
+</Mediainfo>
+

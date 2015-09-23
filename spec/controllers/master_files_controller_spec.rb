@@ -24,6 +24,9 @@ describe MasterFilesController do
         mediainfo = Mediainfo.new
         mediainfo.raw_response = File.read(mediainfo_output)
         allow_any_instance_of(MasterFile).to receive(:mediainfo).and_return mediainfo
+      else
+        mediainfo = Mediainfo.new
+        allow_any_instance_of(MasterFile).to receive(:mediainfo).and_return mediainfo
       end
     end
 

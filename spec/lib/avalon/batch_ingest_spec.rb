@@ -33,6 +33,9 @@ describe Avalon::Batch::Ingest do
     User.create(:username => 'jay@krajcik.org', :email => 'jay@krajcik.org')
     RoleControls.add_user_role('frances.dickens@reichel.com','manager')
     RoleControls.add_user_role('jay@krajcik.org','manager')
+
+    mediainfo = Mediainfo.new
+    allow_any_instance_of(MasterFile).to receive(:mediainfo).and_return mediainfo
   end
 
   after :each do

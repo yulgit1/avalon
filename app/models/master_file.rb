@@ -617,7 +617,7 @@ class MasterFile < ActiveFedora::Base
 
   def post_processing_move_filename(oldpath, options={})
     prefix = options[:pid].gsub(":","_")
-    if oldpath.start_with?(prefix)
+    if File.basename(oldpath).start_with?(prefix)
       oldpath
     else 
       "#{prefix}-#{File.basename(oldpath)}"

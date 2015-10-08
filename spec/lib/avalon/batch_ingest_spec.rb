@@ -34,8 +34,14 @@ describe Avalon::Batch::Ingest do
     RoleControls.add_user_role('frances.dickens@reichel.com','manager')
     RoleControls.add_user_role('jay@krajcik.org','manager')
 
-    mediainfo = Mediainfo.new
-    allow_any_instance_of(MasterFile).to receive(:mediainfo).and_return mediainfo
+    if mediainfo_output
+      mediainfo = Mediainfo.new
+      mediainfo.raw_response = File.read(mediainfo_output)
+      allow_any_instance_of(MasterFile).to receive(:mediainfo).and_return mediainfo
+    else
+      mediainfo = Mediainfo.new
+      allow_any_instance_of(MasterFile).to receive(:mediainfo).and_return mediainfo
+    end
   end
 
   after :each do
@@ -50,6 +56,7 @@ describe Avalon::Batch::Ingest do
   end
 
   describe 'valid manifest' do
+    let(:mediainfo_output) { File.join(@dropbox_dir, 'example_batch_ingest', 'assets', 'sheephead_mountain.mov.xml') }
     let(:collection) { FactoryGirl.create(:collection, name: 'Ut minus ut accusantium odio autem odit.', managers: ['frances.dickens@reichel.com']) }
     let(:batch_ingest) { Avalon::Batch::Ingest.new(collection) }
     let(:bib_id) { '7763100' }

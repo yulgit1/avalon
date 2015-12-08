@@ -15,5 +15,7 @@
 require 'spec_helper'
 
 describe ApiKey do
-
+  it 'should generate an ApiKey' do
+    expect(ApiKey.create!).to be_truthy
+  end
 end

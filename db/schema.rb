@@ -11,7 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150625121750) do
+ActiveRecord::Schema.define(version: 20151208191221) do
+
+  create_table "api_keys", force: true do |t|
+    t.string   "access_token"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "bookmarks", force: true do |t|
     t.integer  "user_id",       null: false
@@ -82,8 +88,8 @@ ActiveRecord::Schema.define(version: 20150625121750) do
   add_index "searches", ["user_id"], name: "index_searches_on_user_id"
 
   create_table "sessions", force: true do |t|
-    t.string   "session_id", null: false
-    t.text     "data"
+    t.string   "session_id",                  null: false
+    t.text     "data",       limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -1,25 +1,26 @@
 # Copyright 2011-2015, The Trustees of Indiana University and Northwestern
 #   University.  Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
-# 
+#
 # You may obtain a copy of the License at
-# 
+#
 # http://www.apache.org/licenses/LICENSE-2.0
-# 
-# Unless required by applicable law or agreed to in writing, software distributed 
+#
+# Unless required by applicable law or agreed to in writing, software distributed
 #   under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-#   CONDITIONS OF ANY KIND, either express or implied. See the License for the 
+#   CONDITIONS OF ANY KIND, either express or implied. See the License for the
 #   specific language governing permissions and limitations under the License.
 # ---  END LICENSE_HEADER BLOCK  ---
 
 require 'avalon/controller/controller_behavior'
 
-class MediaObjectsController < ApplicationController 
+class MediaObjectsController < ApplicationController
   include Avalon::Workflow::WorkflowControllerBehavior
   include Avalon::Controller::ControllerBehavior
   include ConditionalPartials
 
 #  before_filter :enforce_access_controls
+  before_filter :restrict_access, only: [:index, :create, :update, :destroy]
   before_filter :inject_workflow_steps, only: [:edit, :update], unless: proc{|c| request.format.json?}
   before_filter :load_player_context, only: [:show, :show_progress]
 
@@ -105,7 +106,7 @@ class MediaObjectsController < ApplicationController
           @mediaobject.destroy
           break
         end
-      end   
+      end
       @mediaobject.parts_with_order = @mediaobject.parts
       if !@mediaobject.save
         error_messages += ['Failed to create media object:']+@mediaobject.errors.full_messages
@@ -126,7 +127,7 @@ class MediaObjectsController < ApplicationController
       @masterFiles = load_master_files
     end
 
-    if 'preview' == @active_step 
+    if 'preview' == @active_step
       @currentStream = params[:content] ? set_active_file(params[:content]) : @masterFiles.first
       @token = @currentStream.nil? ? "" : StreamToken.find_or_create_session_token(session, @currentStream.pid)
       @currentStreamInfo = @currentStream.nil? ? {} : @currentStream.stream_details(@token, default_url_options[:host])
@@ -137,7 +138,7 @@ class MediaObjectsController < ApplicationController
       end
     end
 
-    if 'access-control' == @active_step 
+    if 'access-control' == @active_step
       @groups = @mediaobject.local_read_groups
       @users = @mediaobject.read_users
       @virtual_groups = @mediaobject.virtual_read_groups
@@ -160,12 +161,12 @@ class MediaObjectsController < ApplicationController
       format.html do
 	if (not @masterFiles.empty? and @currentStream.blank?) then
           redirect_to media_object_path(@mediaobject.pid), flash: { notice: 'That stream was not recognized. Defaulting to the first available stream for the resource' }
-        else 
+        else
           render
         end
       end
       format.json do
-        render :json => @currentStreamInfo 
+        render :json => @currentStreamInfo
       end
     end
   end
@@ -175,7 +176,7 @@ class MediaObjectsController < ApplicationController
     overall = { :success => 0, :error => 0 }
 
     result = Hash[
-      @masterFiles.collect { |mf| 
+      @masterFiles.collect { |mf|
         mf_status = {
           :status => mf.status_code,
           :complete => mf.percent_complete.to_i,
@@ -215,7 +216,7 @@ class MediaObjectsController < ApplicationController
         success_count += 1
       else
         errors += [ "#{media_object.title} (#{params[:id]}) permission denied" ]
-      end      
+      end
     end
     message = "#{success_count} #{'media object'.pluralize(success_count)} successfully deleted."
     message += "These objects were not deleted:</br> #{ errors.join('<br/> ') }" if errors.count > 0
@@ -261,15 +262,15 @@ class MediaObjectsController < ApplicationController
     authorize! :inspect, @mediaobject
 
     respond_to do |format|
-      format.html { 
+      format.html {
         render 'tree', :layout => !request.xhr?
       }
-      format.json { 
+      format.json {
         result = { @mediaobject.pid => {} }
         @mediaobject.parts_with_order.each do |mf|
           result[@mediaobject.pid][mf.pid] = mf.derivatives.collect(&:pid)
         end
-        render :json => result 
+        render :json => result
       }
     end
   end
@@ -290,7 +291,7 @@ class MediaObjectsController < ApplicationController
   end
 
   protected
-  
+
   def load_master_files
     @mediaobject.parts_with_order
   end
@@ -305,7 +306,7 @@ class MediaObjectsController < ApplicationController
       end
       params[:content] = @mediaobject.section_pid[index]
     end
-      
+
     @masterFiles = load_master_files
     @currentStream = params[:content] ? set_active_file(params[:content]) : @masterFiles.first
     @token = @currentStream.nil? ? "" : StreamToken.find_or_create_session_token(session, @currentStream.pid)
@@ -320,7 +321,7 @@ class MediaObjectsController < ApplicationController
   #
   # for immediate playback. Eventually this might be replaced by an AJAX call but for
   # now to update the stream you must do a full page refresh.
-  # 
+  #
   # If the stream is not a member of that media object or does not exist at all then
   # return a nil value that needs to be handled appropriately by the calling code
   # block
@@ -333,6 +334,15 @@ class MediaObjectsController < ApplicationController
 
     # If you haven't dropped out by this point return an empty item
     nil
-  end 
-  
+  end
+
+  private
+
+  # TODO: Move me somewhere more generic
+  # Checks to see if the provided access token is valid or not, redirects to unauthorized if the token is not correct
+  # @return [void]
+  def restrict_access
+    api_key = ApiKey.find_by_access_token(params[:access_token])
+    head :unauthorized unless api_key
+  end
 end

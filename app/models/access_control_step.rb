@@ -35,24 +35,44 @@ class AccessControlStep < Avalon::Workflow::BasicStep
     ["group", "class", "user", "ipaddress"].each do |title|
       if context["submit_add_#{title}"].present?
         limited_access_submit = true
+        begin_time = context["add_#{title}_begin"]
+        end_time = context["add_#{title}_end"]
+        create_lease = begin_time.present? || end_time.present?
         if context["add_#{title}"].present?
           val = context["add_#{title}"].strip
           if title=='user'
-            mediaobject.read_users += [val]
+            if create_lease
+              mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_users: [val]) ]
+            else
+              mediaobject.read_users += [val]
+            end
           elsif title=='ipaddress'
             if ( IPAddr.new(val) rescue false )
-              mediaobject.read_groups += [val]
+              if create_lease
+                mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_groups: [val]) ]
+              else
+                mediaobject.read_groups += [val]
+              end
             else
               context[:error] = "IP Address #{val} is invalid. Valid examples: 124.124.10.10, 124.124.0.0/16, 124.124.0.0/255.255.0.0"
             end
           else
-            mediaobject.read_groups += [val]
+            if create_lease
+              mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_groups: [val]) ]
+            else
+              mediaobject.read_groups += [val]
+            end
           end
         else
           context[:error] = "#{title.titleize} can't be blank."
         end
       end
-      
+      if context['remove_lease'].present?
+        limited_access_submit = true
+        lease = Lease.find( context['remove_lease'] )
+        mediaobject.governing_policies.delete( lease )
+        lease.destroy
+      end
       if context["remove_#{title}"].present?
         limited_access_submit = true
         if ["group", "class", "ipaddress"].include? title

@@ -23,7 +23,7 @@ Unless required by applicable law or agreed to in writing, software distributed
 
       <%#------------ Add access item text field and submit button ------------ %>
       <div class="form-group row">
-        <div class="col-xs-10">
+        <div class="col-xs-6">
 	<% if defined?(dropdown_values) && dropdown_values.present? %>
 	  <%= select_tag "add_#{access_object}", 
 	    options_from_collection_for_select(*dropdown_values), 
@@ -40,6 +40,10 @@ Unless required by applicable law or agreed to in writing, software distributed
 	    disabled: input_disabled  %>
 	<% end %>
         </div>
+        <div class="col-xs-4">
+          <%= text_field_tag "add_#{access_object}_begin", nil %>
+          <%= text_field_tag "add_#{access_object}_end", nil %>
+        </div>
         <%= button_tag "Add", name: "submit_add_#{access_object}", type: "submit",
           class: "btn btn-default col-xs-2", disabled: input_disabled, value: "Add" %>
       </div>
@@ -47,8 +51,8 @@ Unless required by applicable law or agreed to in writing, software distributed
 
     <%#----------- Access item list --------------- %>
     <table class="table table-striped table-hover">
-      <% if members.present? %>
-      <tbody
+      <% if members.present? || leases.present? %>
+      <tbody>
         <% members.each do |member_object| %>
         <tr>
           <td>
@@ -60,17 +64,49 @@ Unless required by applicable law or agreed to in writing, software distributed
               <% end %>
             <% end %>
           </td>
+	  <td class="lease_time">
+	  </td>
+	  <td class="lease_time">
+	  </td>
           <% if !input_disabled %>
           <td>
             <%= link_to "×",
-              polymorphic_path(object, 
-                "remove_#{access_object}".to_sym => member_object, 
+              polymorphic_path(object,
+                "remove_#{access_object}".to_sym => member_object,
                 step: @active_step, donot_advance: true), method: "put",
               class: "btn btn-xs close remove" %>
           </td>
           <% end %>
         </tr>
         <% end %>
+
+        <% leases.each do |lease_object| %>
+        <tr>
+          <td>
+            <%= label_tag do %>
+              <% if defined?(display_helper) && display_helper.present? %>
+                <%= self.send(display_helper, (lease_object.read_groups+lease_object.read_users).first) %>
+              <% else %>
+                <%= (lease_object.read_groups+lease_object.read_users).first %>
+              <% end %>
+            <% end %>
+          </td>
+	  <td class="lease_time">
+	    <%= lease_object.begin_time.strftime('%F') %> to <%= lease_object.end_time.strftime('%F') %>
+	  </td>
+          <% if !input_disabled %>
+          <td>
+            <%= link_to "×",
+              polymorphic_path(object, 
+	        "remove_lease".to_sym => lease_object,
+                step: @active_step, donot_advance: true), method: "put",
+              class: "btn btn-xs close remove" %>
+          </td>
+          <% end %>
+        </tr>
+        <% end %>
+
+
       </tbody>
       <% end %>
     </table> 

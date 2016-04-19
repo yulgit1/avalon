@@ -816,6 +816,39 @@ describe MediaObjectsController, type: :controller do
         end
       end
     end
+
+    context "access controls" do
+      let!(:media_object) { FactoryGirl.create(:media_object) }
+      let!(:user) { Faker::Internet.email }
+      let!(:group) { Faker::Lorem.word }
+      let!(:classname) { Faker::Lorem.word }
+      let!(:ipaddr) { Faker::Internet.ip_v4_address }
+      before(:each) { login_user media_object.collection.managers.first }
+
+      context "grant special read access" do
+        it "adds users to authorized read users" do
+          expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_user: 'Add' }.to change { media_object.reload.read_users }.from([]).to([user])
+        end
+        it "adds groups to authorized read groups" do
+          expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_group: group, submit_add_group: 'Add' }.to change { media_object.reload.read_groups }.from([]).to([group])
+        end
+        it "adds external groups to authorized read groups" do
+          expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_class: classname, submit_add_class: 'Add' }.to change { media_object.reload.read_groups }.from([]).to([classname])
+        end
+        it "adds ips to authorized read groups" do
+          expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_ipaddress: ipaddr, submit_add_ipaddress: 'Add' }.to change { media_object.reload.read_groups }.from([]).to([ipaddr])
+        end
+      end
+
+      context "grant time-based special read access" do
+      end
+
+      context "revoke special read access" do
+      end
+
+      context "revoke time-based special read access" do
+      end
+    end
   end
 
   describe "#show_progress" do

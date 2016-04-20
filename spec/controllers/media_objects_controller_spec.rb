@@ -482,6 +482,26 @@ describe MediaObjectsController, type: :controller do
         expect(response).not_to redirect_to new_user_session_path
       end
 
+      it "should be available to a user on an active lease" do
+        user = FactoryGirl.create(:user)
+        media_object.governing_policies+=[Lease.create(begin_time: Date.yesterday, end_time: Date.tomorrow, read_users: [user.username])]
+        media_object.visibility = 'private'
+        media_object.save
+        login_user user.username
+        get 'show', id: media_object.pid
+        expect(response.response_code).to eq(200)
+      end
+
+      it "should not be available to a user on an inactive lease" do
+        user = FactoryGirl.create(:user)
+        media_object.governing_policies+=[Lease.create(begin_time: Date.parse(2.day.ago.to_s), end_time: Date.yesterday, read_users: [user.username])]
+        media_object.visibility = 'private'
+        media_object.save
+        login_user user.username
+        get 'show', id: media_object.pid
+        expect(response.response_code).not_to eq(200)
+      end
+
       it "should provide a JSON stream description to the client" do
         master_file = FactoryGirl.create(:master_file)
         master_file.mediaobject = media_object
@@ -846,29 +866,46 @@ describe MediaObjectsController, type: :controller do
 
       context "grant and revoke time-based special read access" do
         it "should grant and revoke time-based access for users" do 
-          put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_group: 'Add', add_user_begin: '01/01/2016', add_user_end: '01/02/2016'
-          lease_pid = media_object.reload.governing_policies.first.pid
-          login_as :user
-          get 'show', id: media_object.pid
-          expect(response).not_to redirect_to new_user_session_path
-          put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', remove_lease: :lease_pid
-          get 'show', id: media_object.pid
-          expect(response).to redirect_to new_user_session_path
+          expect {
+            put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_user: 'Add', add_user_begin: Date.yesterday, add_user_end: Date.tomorrow
+            media_object.reload
+          }.to change{media_object.governing_policies.count}.by(1)
+          expect(media_object.governing_policies.last.class).to eq(Lease)
+          lease_pid = media_object.reload.governing_policies.last.pid
+          expect {
+            put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', remove_lease: lease_pid
+            media_object.reload
+          }.to change{media_object.governing_policies.count}.by(-1)
         end
       end
 
       context "must validate lease date ranges" do
         it "should accept valid date range for lease" do
-          put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_group: 'Add', add_user_begin: '01/01/2016', add_user_end: '01/02/2016'
-          expect(media_object.governing_policies.count).to eq(1) 
+          expect { 
+            put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_user: 'Add', add_user_begin: Date.today, add_user_end: Date.tomorrow 
+            media_object.reload
+          }.to change{media_object.governing_policies.count}.by(1)
         end
         it "should reject reverse date range for lease" do
-          put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_group: 'Add', add_user_begin: '01/02/2016', add_user_end: '01/01/2016'
-          expect(media_object.governing_policies.count).to eq(0) 
+          expect { 
+            put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_user: 'Add', add_user_begin: Date.tomorrow, add_user_end: Date.today
+            media_object.reload
+          }.not_to change{media_object.governing_policies.count} 
         end
-
+        it "should accept missing begin date and set it to today" do
+          expect { 
+            put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_user: 'Add', add_user_begin: '', add_user_end: Date.today
+            media_object.reload
+          }.to change{media_object.governing_policies.count}.by(1) 
+          expect(media_object.governing_policies.last.begin_time).to eq(Date.today)
+        end
+        it "should reject missing end date" do
+          expect { 
+            put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_user: 'Add', add_user_begin: Date.tomorrow, add_user_end: ''
+            media_object.reload
+          }.not_to change{media_object.governing_policies.count} 
+        end
       end
-
     end
   end
 

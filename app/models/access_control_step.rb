@@ -35,21 +35,29 @@ class AccessControlStep < Avalon::Workflow::BasicStep
     ["group", "class", "user", "ipaddress"].each do |title|
       if context["submit_add_#{title}"].present?
         limited_access_submit = true
-        begin_time = context["add_#{title}_begin"]
-        end_time = context["add_#{title}_end"]
+        begin_time = context["add_#{title}_begin"].blank? ? nil : context["add_#{title}_begin"] 
+        end_time = context["add_#{title}_end"].blank? ? nil : context["add_#{title}_end"]
         create_lease = begin_time.present? || end_time.present?
         if context["add_#{title}"].present?
           val = context["add_#{title}"].strip
           if title=='user'
             if create_lease
-              mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_users: [val]) ]
+              begin
+                mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_users: [val]) ]
+              rescue Exception => e
+                context[:error] = e.message
+              end
             else
               mediaobject.read_users += [val]
             end
           elsif title=='ipaddress'
             if ( IPAddr.new(val) rescue false )
               if create_lease
-                mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_groups: [val]) ]
+                begin
+                  mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_groups: [val]) ]
+                rescue Exception => e
+                  context[:error] = e.message
+                end
               else
                 mediaobject.read_groups += [val]
               end
@@ -58,7 +66,11 @@ class AccessControlStep < Avalon::Workflow::BasicStep
             end
           else
             if create_lease
-              mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_groups: [val]) ]
+              begin
+                mediaobject.governing_policies += [ Lease.create(begin_time: begin_time, end_time: end_time, read_groups: [val]) ]
+              rescue Exception => e
+                context[:error] = e.message
+              end
             else
               mediaobject.read_groups += [val]
             end
@@ -66,12 +78,6 @@ class AccessControlStep < Avalon::Workflow::BasicStep
         else
           context[:error] = "#{title.titleize} can't be blank."
         end
-      end
-      if context['remove_lease'].present?
-        limited_access_submit = true
-        lease = Lease.find( context['remove_lease'] )
-        mediaobject.governing_policies.delete( lease )
-        lease.destroy
       end
       if context["remove_#{title}"].present?
         limited_access_submit = true
@@ -82,7 +88,12 @@ class AccessControlStep < Avalon::Workflow::BasicStep
         end
       end
     end
-
+    if context['remove_lease'].present?
+      limited_access_submit = true
+      lease = Lease.find( context['remove_lease'] )
+      mediaobject.governing_policies.delete( lease )
+      lease.destroy
+    end
     unless limited_access_submit
       mediaobject.visibility = context[:visibility] unless context[:visibility].blank? 
       mediaobject.hidden = context[:hidden] == "1"
@@ -95,9 +106,13 @@ class AccessControlStep < Avalon::Workflow::BasicStep
     context[:users] = mediaobject.read_users
     context[:groups] = mediaobject.read_groups
     context[:virtual_groups] = mediaobject.virtual_read_groups
+    context[:ip_groups] = mediaobject.ip_read_groups
+    context[:group_leases] = mediaobject.governing_policies.to_a.select { |p| p.class==Lease && p.lease_type=="local" }
+    context[:user_leases] = mediaobject.governing_policies.to_a.select { |p| p.class==Lease && p.lease_type=="user" }
+    context[:virtual_leases] = mediaobject.governing_policies.to_a.select { |p| p.class==Lease && p.lease_type=="external" }
+    context[:ip_leases] = mediaobject.governing_policies.to_a.select { |p| p.class==Lease && p.lease_type=="ip" }
     context[:addable_groups] = Admin::Group.non_system_groups.reject { |g| context[:groups].include? g.name }
     context[:addable_courses] = Course.all.reject { |c| context[:virtual_groups].include? c.context_id }
-
     context
   end
 end

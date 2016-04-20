@@ -825,29 +825,50 @@ describe MediaObjectsController, type: :controller do
       let!(:ipaddr) { Faker::Internet.ip_v4_address }
       before(:each) { login_user media_object.collection.managers.first }
 
-      context "grant special read access" do
-        it "adds users to authorized read users" do
+      context "grant and revoke special read access" do
+        it "grants and revokes special read access to users" do
           expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_user: 'Add' }.to change { media_object.reload.read_users }.from([]).to([user])
+          expect {put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', remove_user: user, submit_remove_user: 'Remove' }.to change { media_object.reload.read_users }.from([user]).to([]) 
         end
-        it "adds groups to authorized read groups" do
+        it "grants and revokes special read access to groups" do
           expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_group: group, submit_add_group: 'Add' }.to change { media_object.reload.read_groups }.from([]).to([group])
+          expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', remove_group: group, submit_remove_group: 'Remove' }.to change { media_object.reload.read_groups }.from([group]).to([])
         end
-        it "adds external groups to authorized read groups" do
+        it "grants and revokes special read access to external groups" do
           expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_class: classname, submit_add_class: 'Add' }.to change { media_object.reload.read_groups }.from([]).to([classname])
+          expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', remove_class: classname, submit_remove_class: 'Remove' }.to change { media_object.reload.read_groups }.from([classname]).to([])
         end
-        it "adds ips to authorized read groups" do
+        it "grants and revokes special read access to ips" do
           expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_ipaddress: ipaddr, submit_add_ipaddress: 'Add' }.to change { media_object.reload.read_groups }.from([]).to([ipaddr])
+          expect { put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', remove_ipaddress: ipaddr, submit_remove_ipaddress: 'Remove' }.to change { media_object.reload.read_groups }.from([ipaddr]).to([])
         end
       end
 
-      context "grant time-based special read access" do
+      context "grant and revoke time-based special read access" do
+        it "should grant and revoke time-based access for users" do 
+          put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_group: 'Add', add_user_begin: '01/01/2016', add_user_end: '01/02/2016'
+          lease_pid = media_object.reload.governing_policies.first.pid
+          login_as :user
+          get 'show', id: media_object.pid
+          expect(response).not_to redirect_to new_user_session_path
+          put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', remove_lease: :lease_pid
+          get 'show', id: media_object.pid
+          expect(response).to redirect_to new_user_session_path
+        end
       end
 
-      context "revoke special read access" do
+      context "must validate lease date ranges" do
+        it "should accept valid date range for lease" do
+          put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_group: 'Add', add_user_begin: '01/01/2016', add_user_end: '01/02/2016'
+          expect(media_object.governing_policies.count).to eq(1) 
+        end
+        it "should reject reverse date range for lease" do
+          put :update, id: media_object.id, step: 'access-control', donot_advance: 'true', add_user: user, submit_add_group: 'Add', add_user_begin: '01/02/2016', add_user_end: '01/01/2016'
+          expect(media_object.governing_policies.count).to eq(0) 
+        end
+
       end
 
-      context "revoke time-based special read access" do
-      end
     end
   end
 

@@ -36,6 +36,33 @@ class User < ActiveRecord::Base
     user_key
   end
 
+  def self.find_for_cas(access_token, singed_in_resource=nil)
+    logger.info "in find_for_cas"
+    user_info = User.getExtraFromLDAP(access_token.uid)
+    user_info["mail"] ? email = user_info["mail"][0] : email = ""
+    user_info["uid"] ? username = user_info["uid"][0] : username = ""
+    provider = access_token.provider
+    logger.info "provider: #{provider}" # access_token.inspect
+    logger.info "email: #{email}" #access_token.provider
+    logger.info "username: #{username}" #access_token.uid
+
+    user = User.where(provider: provider,username: username)
+    if user.empty? == false
+      logger.info "signing in as user #{user.inspect}"
+      user = user[0]
+      if user.email != email
+        logger.info "email from ldap #{email} doesn't match email in this app #{user.email}, update."
+        user.email = email
+        user.save!
+      end
+    else
+      logger.info "no user found, creating #{provider.upcase} user #{username} email #{email}"
+      user = User.new(:username => username, :provider => provider, :email => email)
+      user.save!
+    end 
+    user
+  end
+
   def self.find_for_identity(access_token, signed_in_resource=nil)
     username = access_token.info['email']
     User.find_by_username(username) || User.find_by_email(username) || User.create(username: username, email: username)
@@ -88,6 +115,21 @@ class User < ActiveRecord::Base
       User.walk_ldap_groups(User.ldap_member_of(g), seen)
     end
     seen
+  end
+
+  protected
+
+  def self.getExtraFromLDAP(netid)
+    begin
+      require 'net/ldap'
+      ldap = Net::LDAP.new( :host =>"directory.yale.edu" , :port =>"389" )
+      f = Net::LDAP::Filter.eq('uid', netid)
+      b = 'ou=People,o=yale.edu'
+      p = ldap.search(:base => b, :filter => f, :return_result => true).first
+    rescue Exception => e
+      return
+    end
+    return p
   end
 
 end
